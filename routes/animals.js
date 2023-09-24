@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const animals = require('./animals');
-
 const mongoose = require('mongoose');
 
-const { saveAnimal, readAnimals, updateAnimalByUser } = require('../db_manager/db_client_animals');
+const { saveAnimal, readAnimals, updateAnimalByUser, deleteAnimalByUser } = require('../db_manager/db_client_animals');
 
 const animal = {
     urlImageAnimal: "url da imagem",
@@ -97,21 +95,25 @@ router.put('/update-animal', async (req, res) => {
 
 });
 
-// router.delete('/delete-users/:id', async (req, res) => {
-//     const userId = req.params.id;
+router.delete('/delete-animal', async (req, res) => {
+    var userId;
+    var animalId;
 
-//     if (!mongoose.Types.ObjectId.isValid(userId)) {
-//         return res.status(400).json({ error: 'ID de documento inválido.' });
-//     }
+    if(req.body) {
+        userId = req.body.userId;
+        animalId = req.body.animalId;
+    }
 
-//     try {
-//         await deleteUserById(userId);
-//         res.json({ message: 'Usuário deletado com sucesso.' });
-//     } catch (error) {
-//         res.status(500).json({ error: 'Erro ao deletar usuário.' });
-//     }
-// });
+    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(animalId)) {
+        return res.status(400).json({ error: 'ID do usuário ou do animal inválido.' });
+    }
 
-// router.use('/animals', animals);
+    try {
+        var result = await deleteAnimalByUser(userId, animalId);
+        res.json({ message: result });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao deletar animal.' });
+    }
+});
 
 module.exports = router;

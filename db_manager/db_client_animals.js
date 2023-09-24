@@ -49,17 +49,17 @@ async function updateAnimalByUser(userId, destAnimalId, newAnimal) {
                 }
             });
 
-            if(find) {
+            if (find) {
                 user.animals = animals;
                 await user.save();
-    
+
                 console.log("Animal atualizado com sucesso.");
                 return "Animal atualizado com sucesso.";
             } else {
                 console.log("Animal não encontrado para atualização.");
                 return "Animal não encontrado para atualização.";
             }
-           
+
         }
 
     } catch (error) {
@@ -68,23 +68,38 @@ async function updateAnimalByUser(userId, destAnimalId, newAnimal) {
     }
 }
 
-// async function deleteAnimalByUser(userId) {
-//     console.log(userId);
-//     try {
-//         const result = await ModelUserClass.deleteOne(userId);
-//         if(!result) {
-//             throw new Error('Documento não encontrado.');
-//         }
-//         console.log("Documento deletado com sucesso:", result);
-//     } catch (error) {
-//         console.error('Erro ao deletar o documento:', error);
-//         return null;
-//     }
-// }
+async function deleteAnimalByUser(userId, animalId) {
+
+    try {
+        var user = await readUserById(userId);
+        console.log(user.animals);
+        if (user != null && animalId != null) {
+            var animals = user.animals;
+
+            const index = animals.findIndex((animal) => animal._id.toString() === animalId.toString());
+
+            if (index >= 0) {
+                user.animals.splice(index, 1);
+                await user.save();
+
+                console.log("Animal deletado com sucesso.");
+                return "Animal deletado com sucesso.";
+            } else {
+                console.log("Animal não encontrado para deleção.");
+                return "Animal não encontrado para deleção.";
+            }
+
+        }
+        console.log("Documento deletado com sucesso:", result);
+    } catch (error) {
+        console.error('Erro ao deletar o animal:', error);
+        return "Erro ao deletar animal";
+    }
+}
 
 module.exports = {
     saveAnimal,
     readAnimals,
-    updateAnimalByUser
-    // deleteAnimalByUser
+    updateAnimalByUser,
+    deleteAnimalByUser
 };
