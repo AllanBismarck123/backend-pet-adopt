@@ -2,10 +2,17 @@ const express = require('express');
 const router = express.Router();
 
 const animals = require('./animals');
+const requests_adopts = require('./requests_adopts');
 
 const mongoose = require('mongoose');
 
-const { saveUser, readUser, readUserById, updateUserById, deleteUserById } = require('../db_manager/db_client_user_mongo');
+const { 
+  saveUser, 
+  readUser, 
+  readUserById, 
+  updateUserById, 
+  deleteUserById 
+} = require('../db_manager/db_client_user_mongo');
 
 const user = {
   ngoName: "ONG",
@@ -99,5 +106,6 @@ router.delete('/delete-users/:id', async (req, res) => {
 });
 
 router.use('/animals', animals);
+router.use('/requests', requests_adopts);
 
 module.exports = router;

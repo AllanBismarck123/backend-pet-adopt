@@ -1,5 +1,5 @@
 const { ModelAnimalClass } = require('../models/model_animal');
-const { readUserById, updateUserById } = require('./db_client_user_mongo');
+const { readUserById } = require('./db_client_user_mongo');
 
 async function saveAnimal(userId, data) {
     try {

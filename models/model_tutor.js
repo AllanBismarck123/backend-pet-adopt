@@ -42,11 +42,12 @@ const modelTutorObj = mongoose.Schema({
     city: String,
     state: String,
     telephone: String,
-    email: String,
+    email: String
 });
 
 const ModelTutorClass = mongoose.model('ModelTutor', modelTutorObj);
 
 module.exports = {
-    ModelTutorClass
+    ModelTutorClass,
+    modelTutorObj
 };
