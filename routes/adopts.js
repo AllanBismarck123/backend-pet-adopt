@@ -1,0 +1,129 @@
+const express = require('express');
+const router = express.Router();
+
+const mongoose = require('mongoose');
+
+const { acceptAdopt } = require('../db_manager/db_client_adopts');
+
+router.post('/accept-adopt', async (req, res) => {
+    const userId = req.body.userId;
+    const requestId = req.body.requestId;
+
+    try {
+        await acceptAdopt(userId, requestId);
+        res.status(200).json({ message: 'Adoção aceita com sucesso.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao aceitar adoção.' });
+    }
+});
+
+// router.get('/all-animals', async (req, res) => {
+//     var userId;
+
+//     if (req.body) {
+//         userId = req.body.id;
+//         console.log(userId);
+//     }
+
+//     try {
+//         const data = await readAnimals(userId);
+//         res.status(200).json(data);
+//     } catch (error) {
+//         res.status(500).json({ error: 'Erro ao ler animais.' });
+//     }
+// });
+
+// router.get('/read-animal', async (req, res) => {
+//     var userId;
+//     var animalId;
+
+//     if (req.body) {
+//         userId = req.body.userId;
+//         animalId = req.body.animalId
+//         console.log(userId);
+//         console.log(animalId);
+//     }
+
+//     try {
+//         const data = await readAnimalById(userId, animalId);
+//         res.status(200).json(data);
+//     } catch (error) {
+//         res.status(500).json({ error: 'Erro ao ler animal.' });
+//     }
+// });
+
+// router.put('/update-animal', async (req, res) => {
+
+//     var userId;
+//     var newAnimal;
+//     var destAnimalId;
+//     var urlImageAnimal;
+//     var animalName;
+//     var specie;
+//     var race;
+//     var age;
+//     var specialCondition;
+//     var sex;
+
+//     if (req.body) {
+//         userId = req.body.userId;
+//         destAnimalId = req.body.destAnimalId;
+//         newAnimal = req.body.newAnimal;
+
+//         urlImageAnimal = newAnimal.urlImageAnimal;
+//         animalName = newAnimal.animalName;
+//         specie = newAnimal.specie;
+//         race = newAnimal.race;
+//         age = newAnimal.age;
+//         specialCondition = newAnimal.specialCondition;
+//         sex = newAnimal.sex;
+
+//         if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(destAnimalId)) {
+//             return res.status(400).json({ error: 'ID de usuário ou animal inválido.' });
+//         }
+
+//         if (
+//             urlImageAnimal == null 
+//             && animalName == null 
+//             && specie == null 
+//             && race == null 
+//             && age == null 
+//             && specialCondition == null 
+//             && sex == null
+//         ) {
+//             return res.status(400).json({ error: 'Novos dados são obrigatórios.' });
+//         }
+
+//     }
+
+//     try {
+//         var result = await updateAnimalByUser(userId, destAnimalId, newAnimal);
+//         res.status(200).json({ message: result });
+//     } catch (error) {
+//         res.status(500).json({ error: 'Erro ao atualizar o animal.' });
+//     }
+
+// });
+
+// router.delete('/delete-animal', async (req, res) => {
+//     var userId;
+//     var animalId;
+
+//     if(req.body) {
+//         userId = req.body.userId;
+//         animalId = req.body.animalId;
+//     }
+
+//     if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(animalId)) {
+//         return res.status(400).json({ error: 'ID do usuário ou do animal inválido.' });
+//     }
+
+//     try {
+//         var result = await deleteAnimalByUser(userId, animalId);
+//         res.json({ message: result });
+//     } catch (error) {
+//         res.status(500).json({ error: 'Erro ao deletar animal.' });
+//     }
+// });
+
+module.exports = router;

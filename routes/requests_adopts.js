@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const { 
     saveRequestAdopt,
     readRequestsAdopt,
+    readRequestById,
     deleteRequestByUser
  } = require('../db_manager/db_client_requests_adopt');
 
@@ -59,6 +60,25 @@ router.get('/all-requests', async (req, res) => {
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler requisições de adoção.' });
+    }
+});
+
+router.get('/read-request', async (req, res) => {
+    var userId;
+    var requestId;
+
+    if (req.body) {
+        userId = req.body.userId;
+        requestId = req.body.requestId
+        console.log(userId);
+        console.log(requestId);
+    }
+
+    try {
+        const data = await readRequestById(userId, requestId);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao ler requisição.' });
     }
 });
 

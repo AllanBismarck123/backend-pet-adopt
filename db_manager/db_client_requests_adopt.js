@@ -4,7 +4,6 @@ const { readUserById } = require('./db_client_user_mongo');
 async function saveRequestAdopt(tutor, animalId, ngoId) {
     try {
         const dataToInsert = new ModelRequestAdoptClass({ tutor: tutor, animalId: animalId });
-        console.log(dataToInsert);
         var user = await readUserById(ngoId);
 
         user.requestsAdopts.push(dataToInsert);
@@ -20,6 +19,25 @@ async function readRequestsAdopt(ngoId) {
     try {
         const user = await readUserById(ngoId);
         return user.requestsAdopts;
+    } catch (error) {
+        console.error('Erro:', error);
+        return [];
+    }
+}
+
+async function readRequestById(userId, requestId) {
+    try {
+
+        const user = await readUserById(userId);
+
+        if (user != null && requestId != null) {
+            var requestsAdopts = user.requestsAdopts;
+            const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
+
+            return user.requestsAdopts[index];
+        }
+
+        return [];
     } catch (error) {
         console.error('Erro:', error);
         return [];
@@ -58,5 +76,6 @@ async function deleteRequestByUser(userId, requestId) {
 module.exports = {
     saveRequestAdopt,
     readRequestsAdopt,
+    readRequestById,
     deleteRequestByUser
 };

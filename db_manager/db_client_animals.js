@@ -4,7 +4,6 @@ const { readUserById } = require('./db_client_user_mongo');
 async function saveAnimal(userId, data) {
     try {
         const dataToInsert = new ModelAnimalClass(data);
-        console.log(dataToInsert);
         var user = await readUserById(userId);
 
         user.animals.push(dataToInsert);
@@ -26,6 +25,26 @@ async function readAnimals(userId) {
     }
 }
 
+async function readAnimalById(userId, animalId) {
+
+    try {
+
+        const user = await readUserById(userId);
+
+        if (user != null && animalId != null) {
+            var animals = user.animals;
+            const index = animals.findIndex((animal) => animal._id.toString() === animalId.toString());
+
+            return user.animals[index];
+        }
+
+        return [];
+    } catch (error) {
+        console.error('Erro:', error);
+        return [];
+    }
+}
+
 async function updateAnimalByUser(userId, destAnimalId, newAnimal) {
     try {
         var user = await readUserById(userId);
@@ -34,8 +53,6 @@ async function updateAnimalByUser(userId, destAnimalId, newAnimal) {
             var find = false;
 
             animals.forEach((i) => {
-                console.log(`i: ${i._id}`);
-                console.log(`dest: ${destAnimalId}`);
                 if (i._id.toString() === destAnimalId.toString()) {
                     find = true;
 
@@ -72,7 +89,6 @@ async function deleteAnimalByUser(userId, animalId) {
 
     try {
         var user = await readUserById(userId);
-        console.log(user.animals);
         if (user != null && animalId != null) {
             var animals = user.animals;
 
@@ -100,6 +116,7 @@ async function deleteAnimalByUser(userId, animalId) {
 module.exports = {
     saveAnimal,
     readAnimals,
+    readAnimalById,
     updateAnimalByUser,
     deleteAnimalByUser
 };

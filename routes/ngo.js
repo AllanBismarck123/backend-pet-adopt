@@ -3,6 +3,7 @@ const router = express.Router();
 
 const animals = require('./animals');
 const requests_adopts = require('./requests_adopts');
+const adopts = require('./adopts');
 
 const mongoose = require('mongoose');
 
@@ -107,5 +108,6 @@ router.delete('/delete-users/:id', async (req, res) => {
 
 router.use('/animals', animals);
 router.use('/requests', requests_adopts);
+router.use('/adopts', adopts);
 
 module.exports = router;

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { ModelUserClass } = require('../models/model_user');
-
-const collectionName = 'ngo_users';
+const { ObjectId } = require('mongodb');
 
 mongoose.connect(process.env.MONGO_DB_URI,
  { useNewUrlParser: true, useUnifiedTopology: true })
@@ -10,7 +9,6 @@ mongoose.connect(process.env.MONGO_DB_URI,
 
 async function saveUser(data) {
     const dataToInsert = new ModelUserClass(data);
-    console.log(data);
     try {
         ModelUserClass.createCollection().then((collection) => {
             console.log("Collection is created!");
@@ -35,7 +33,6 @@ async function readUser() {
 async function readUserById(userId) {
     try {
         const user = await ModelUserClass.findById(userId).exec();
-        console.log(user);
         return user;
     } catch (error) {
         console.error('Erro:', error);
@@ -58,9 +55,9 @@ async function updateUserById(userId, newNgoName, newEmail) {
 }
 
 async function deleteUserById(userId) {
-    console.log(userId);
     try {
-        const result = await ModelUserClass.deleteOne(userId);
+        var userObjId = new ObjectId(userId);
+        const result = await ModelUserClass.deleteOne(userObjId);
         if(!result) {
             throw new Error('Documento não encontrado.');
         }

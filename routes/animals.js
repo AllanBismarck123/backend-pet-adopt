@@ -3,7 +3,13 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
-const { saveAnimal, readAnimals, updateAnimalByUser, deleteAnimalByUser } = require('../db_manager/db_client_animals');
+const { 
+    saveAnimal, 
+    readAnimals, 
+    readAnimalById, 
+    updateAnimalByUser, 
+    deleteAnimalByUser
+} = require('../db_manager/db_client_animals');
 
 const animal = {
     urlImageAnimal: "url da imagem",
@@ -39,6 +45,25 @@ router.get('/all-animals', async (req, res) => {
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animais.' });
+    }
+});
+
+router.get('/read-animal', async (req, res) => {
+    var userId;
+    var animalId;
+
+    if (req.body) {
+        userId = req.body.userId;
+        animalId = req.body.animalId
+        console.log(userId);
+        console.log(animalId);
+    }
+
+    try {
+        const data = await readAnimalById(userId, animalId);
+        res.status(200).json(data);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao ler animal.' });
     }
 });
 
