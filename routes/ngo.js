@@ -7,12 +7,12 @@ const adopts = require('./adopts');
 
 const mongoose = require('mongoose');
 
-const { 
-  saveUser, 
-  readUser, 
-  readUserById, 
-  updateUserById, 
-  deleteUserById 
+const {
+  saveUser,
+  readUser,
+  readUserById,
+  updateUserById,
+  deleteUserById
 } = require('../db_manager/db_client_user_mongo');
 
 const user = {
