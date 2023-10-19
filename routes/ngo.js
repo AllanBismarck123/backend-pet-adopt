@@ -40,8 +40,13 @@ router.get('/users', async (req, res) => {
   }
 });
 
-router.get('/users/:id', async (req, res) => {
-  const userId = req.params.id;
+router.get('/user', async (req, res) => {
+
+  var userId;
+
+  if(req.body) {
+    userId = req.body.userId;
+  }
 
   console.log(userId);
 
@@ -61,14 +66,14 @@ router.get('/users/:id', async (req, res) => {
   }
 });
 
-router.put('/update-users/:id', async (req, res) => {
+router.put('/update-user', async (req, res) => {
 
   var userId;
   var newNgoName;
   var newEmail;
 
   if (req.body) {
-    userId = req.params.id;
+    userId = req.body.userId;
     newNgoName = req.body.newNgoName;
     newEmail = req.body.newEmail;
 
@@ -91,8 +96,12 @@ router.put('/update-users/:id', async (req, res) => {
 
 });
 
-router.delete('/delete-users/:id', async (req, res) => {
-  const userId = req.params.id;
+router.delete('/delete-user', async (req, res) => {
+  var userId;
+
+  if(req.body) {
+    userId = req.body.userId;
+  }
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(400).json({ error: 'ID de documento inválido.' });

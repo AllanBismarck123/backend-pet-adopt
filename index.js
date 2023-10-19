@@ -19,16 +19,16 @@ app.use(express.json());
 const hostname = '0.0.0.0';
 const port = 4000;
 
-// app.use('/ngo', ngo);
+app.use('/ngo', ngo);
 
-app.get('/test', async (req, res) => {
-    console.log(process.env.EMAIL_USER);
-    console.log(process.env.PASSWORD);
-    try {
-        await notificatorRejectAdopt();
-    } catch (error) {
-        res.status(500).json({ error: error });
-    }
-});
+// app.get('/test', async (req, res) => {
+//     console.log(process.env.EMAIL_USER);
+//     console.log(process.env.PASSWORD);
+//     try {
+//         await notificatorRejectAdopt();
+//     } catch (error) {
+//         res.status(500).json({ error: error });
+//     }
+// });
 
 app.listen(port, hostname);
