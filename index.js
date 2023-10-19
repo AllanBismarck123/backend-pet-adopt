@@ -8,7 +8,7 @@ try {
     console.error('Erro ao carregar variáveis de ambiente:', error);
 }
 
-const { sendEmails } = require('./notificators/notificator_email');
+const { notificatorSendRequestUser, notificatorSendRequestNgo, notificatorAcceptAdoptUser, notificatorAcceptAdoptNgo, notificatorRejectAdopt } = require('./notificators/notificator_email');
 
 const app = express();
 
@@ -25,7 +25,7 @@ app.get('/test', async (req, res) => {
     console.log(process.env.EMAIL_USER);
     console.log(process.env.PASSWORD);
     try {
-        await sendEmails();
+        await notificatorRejectAdopt();
     } catch (error) {
         res.status(500).json({ error: error });
     }
