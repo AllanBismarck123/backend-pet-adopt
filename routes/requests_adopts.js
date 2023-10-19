@@ -40,6 +40,14 @@ router.post('/create-request', async (req, res) => {
     }
 
     try {
+        var requests = await readRequestsAdopt(ngoId);
+
+        const existingRequest = requests.find((element) => element.tutor.cpf === tutor.cpf && element.animalId === animalId);
+
+        if (existingRequest) {
+            return res.status(400).json({ message: 'Você já fez uma solicitação de adoção para esse animal, aguarde o andamento do processo de adoção.' });
+        }
+
         await saveRequestAdopt(tutor, animalId, ngoId);
         res.status(200).json({ message: 'Requisição de adoção realizada com sucesso.' });
     } catch (error) {
