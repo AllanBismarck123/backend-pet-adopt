@@ -8,11 +8,18 @@ const {
     readRequestsAdopt,
     readRequestById,
     deleteRequestByUser
- } = require('../db_manager/db_client_requests_adopt');
+} = require('../db_manager/db_client_requests_adopt');
+
+const { 
+    notificatorSendRequestUser, 
+    notificatorSendRequestNgo  
+} = require('../notificators/notificator_email');
+
+const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 
 const tutor = {
     urlImageTutor: "",
-    tutorName: "Nome do tutor",
+    tutorName: "Nome do tutor 2",
     cpf: "Cpf do tutor2",
     rg: "RG do tutor",
     age: "idade do tutor",
@@ -22,7 +29,7 @@ const tutor = {
     city: "Cidade",
     state: "Estado",
     telephone: "telephone",
-    email: "email"
+    email: "allan_b95@outlook.com"
 }
 
 router.post('/create-request', async (req, res) => {
@@ -35,8 +42,6 @@ router.post('/create-request', async (req, res) => {
         // tutor = req.body.tutor;
         ngoId = req.body.ngoId;
         animalId = req.body.animalId;
-        console.log(ngoId);
-        console.log(animalId);
     }
 
     try {
@@ -49,6 +54,11 @@ router.post('/create-request', async (req, res) => {
         }
 
         await saveRequestAdopt(tutor, animalId, ngoId);
+
+        const request = new ModelRequestAdoptClass({ tutor: tutor, animalId: animalId });
+        await notificatorSendRequestUser(request, ngoId);
+        await notificatorSendRequestNgo(request, ngoId);
+
         res.status(200).json({ message: 'Requisição de adoção realizada com sucesso.' });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao realizar requisição de adoção.' });

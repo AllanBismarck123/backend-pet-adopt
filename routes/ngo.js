@@ -17,7 +17,7 @@ const {
 
 const user = {
   ngoName: "ONG",
-  email: "ONG@ONG.com",
+  email: "allan_b95@outlook.com",
   animals: [],
   adopts: []
 }

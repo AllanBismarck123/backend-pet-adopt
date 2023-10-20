@@ -1,6 +1,10 @@
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 const { readUserById } = require('./db_client_user_mongo');
 
+const { 
+    notificatorRejectAdopt  
+} = require('../notificators/notificator_email');
+
 async function saveRequestAdopt(tutor, animalId, ngoId) {
     try {
         const dataToInsert = new ModelRequestAdoptClass({ tutor: tutor, animalId: animalId });
@@ -55,6 +59,8 @@ async function deleteRequestByUser(userId, requestId) {
             const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
 
             if (index >= 0) {
+                await notificatorRejectAdopt(userId, user.requestsAdopts[index]);
+                
                 user.requestsAdopts.splice(index, 1);
                 await user.save();
 

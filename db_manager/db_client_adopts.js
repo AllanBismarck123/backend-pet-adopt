@@ -2,6 +2,11 @@ const { ModelAdoptClass } = require('../models/model_adopt');
 const { readAnimalById, deleteAnimalByUser } = require('./db_client_animals');
 const { readRequestById, deleteRequestByUser } = require('./db_client_requests_adopt');
 const { readUserById } = require('./db_client_user_mongo');
+const { 
+    notificatorAcceptAdoptUser, 
+    notificatorAcceptAdoptNgo, 
+    notificatorRejectAdopt 
+} = require('../notificators/notificator_email');
 
 async function acceptAdopt(userId, requestId) {
     try {
@@ -12,12 +17,9 @@ async function acceptAdopt(userId, requestId) {
         const tutor = request.tutor;
 
         const dataToInsert = new ModelAdoptClass({ animal: animal, tutor: tutor});
-        console.log(dataToInsert);
 
         await user.adopts.push(dataToInsert);
         await user.save();
-
-        await deleteAnimalByUser(userId, request.animalId);
 
         user = await readUserById(userId);
         var length = user.requestsAdopts.length;
@@ -25,16 +27,15 @@ async function acceptAdopt(userId, requestId) {
         if(length > 0) {
             var index = 0;
             while(index < length) {
-                console.log(user.requestsAdopts[index].animalId);
-                console.log(request.animalId);
-                console.log('\n');
                 if( 
                     user.requestsAdopts[index] 
                     && user.requestsAdopts[index].animalId 
                     && user.requestsAdopts[index].animalId.toString() 
                     === request.animalId.toString()
                 ) {
-                    console.log(index);
+                    if(tutor.cpf !== user.requestsAdopts[index].tutor.cpf) {
+                        await notificatorRejectAdopt(userId, user.requestsAdopts[index]);
+                    }
                     user.requestsAdopts.splice(index, 1);
                     await user.save();
                     index--;
@@ -44,7 +45,12 @@ async function acceptAdopt(userId, requestId) {
             }
         }
 
+        await deleteAnimalByUser(userId, request.animalId);
+
         const result = await user.save();
+        await notificatorAcceptAdoptUser(userId, dataToInsert);
+        await notificatorAcceptAdoptNgo(userId, dataToInsert);
+
         console.log('Documento inserido com sucesso:', result._id);
     } catch (error) {
         console.error('Erro:', error);
