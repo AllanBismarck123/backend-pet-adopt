@@ -2,7 +2,6 @@ const { ModelAdoptClass } = require('../models/model_adopt');
 const { readAnimalById, deleteAnimalByUser } = require('./db_client_animals');
 const { readRequestById, deleteRequestByUser } = require('./db_client_requests_adopt');
 const { readUserById } = require('./db_client_user_mongo');
-const { ObjectId } = require('mongodb');
 
 async function acceptAdopt(userId, requestId) {
     try {
@@ -52,6 +51,26 @@ async function acceptAdopt(userId, requestId) {
     }
 }
 
+async function rejectAll(userId, animalId) {
+    try {
+
+        var user = await readUserById(userId);
+
+        const updatedRequests = user.requestsAdopts.filter(request => request.animalId !== animalId);
+
+        user.requestsAdopts = updatedRequests;
+
+        console.log(user.requestsAdopts.length);
+
+        const result = await user.save();
+
+        console.log('Lista de adoções excluída com sucesso: ', result._id);
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
 module.exports = {
-    acceptAdopt
+    acceptAdopt,
+    rejectAll
 };
