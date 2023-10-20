@@ -70,7 +70,6 @@ router.get('/all-requests', async (req, res) => {
 
     if (req.body) {
         ngoId = req.body.ngoId;
-        console.log(ngoId);
     }
 
     try {
@@ -88,8 +87,6 @@ router.get('/read-request', async (req, res) => {
     if (req.body) {
         userId = req.body.userId;
         requestId = req.body.requestId
-        console.log(userId);
-        console.log(requestId);
     }
 
     try {

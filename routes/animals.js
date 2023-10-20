@@ -37,7 +37,6 @@ router.get('/all-animals', async (req, res) => {
 
     if (req.body) {
         userId = req.body.id;
-        console.log(userId);
     }
 
     try {
@@ -55,8 +54,6 @@ router.get('/read-animal', async (req, res) => {
     if (req.body) {
         userId = req.body.userId;
         animalId = req.body.animalId
-        console.log(userId);
-        console.log(animalId);
     }
 
     try {

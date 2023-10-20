@@ -66,8 +66,6 @@ async function rejectAll(userId, animalId) {
 
         user.requestsAdopts = updatedRequests;
 
-        console.log(user.requestsAdopts.length);
-
         const result = await user.save();
 
         console.log('Lista de adoções excluída com sucesso: ', result._id);

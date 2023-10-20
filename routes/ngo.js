@@ -48,8 +48,6 @@ router.get('/user', async (req, res) => {
     userId = req.body.userId;
   }
 
-  console.log(userId);
-
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(400).json({ error: 'ID de usuário inválido.' });
   }
@@ -60,7 +58,6 @@ router.get('/user', async (req, res) => {
       return res.status(404).json({ error: 'Usuário não encontrado.' });
     }
     res.status(200).json(user);
-    console.log(user);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar usuário.' });
   }
