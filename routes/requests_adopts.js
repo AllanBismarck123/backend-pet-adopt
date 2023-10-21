@@ -13,7 +13,7 @@ const {
 const { 
     notificatorSendRequestUser, 
     notificatorSendRequestNgo  
-} = require('../notificators/notificator_email');
+} = require('../notificators/notificator_request');
 
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 

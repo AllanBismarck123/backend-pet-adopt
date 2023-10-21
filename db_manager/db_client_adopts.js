@@ -6,7 +6,7 @@ const {
     notificatorAcceptAdoptUser, 
     notificatorAcceptAdoptNgo, 
     notificatorRejectAdopt 
-} = require('../notificators/notificator_email');
+} = require('../notificators/notificator_adopt');
 
 async function acceptAdopt(userId, requestId) {
     try {

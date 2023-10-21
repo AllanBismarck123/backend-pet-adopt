@@ -3,7 +3,7 @@ const { readUserById } = require('./db_client_user_mongo');
 
 const { 
     notificatorRejectAdopt  
-} = require('../notificators/notificator_email');
+} = require('../notificators/notificator_adopt');
 
 async function saveRequestAdopt(tutor, animalId, ngoId) {
     try {
