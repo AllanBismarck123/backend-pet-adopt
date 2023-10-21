@@ -57,20 +57,24 @@ async function acceptAdopt(userId, requestId) {
     }
 }
 
-async function deleteAdopt(adoptId, ngoId) {
+async function undoAdopt(adoptId, ngoId) {
     try {
 
         var user = await readUserById(ngoId);
 
+        const adopt = user.adopts.filter(adopt => adopt._id.toString() === adoptId);
+        const animal = adopt[0].animal;
+        console.log(animal);
+
         const updatedAdopts = user.adopts.filter(adopt => adopt._id.toString() !== adoptId);
 
-        console.log(updatedAdopts);
+        user.animals.push(animal);
 
         user.adopts = updatedAdopts;
 
         const result = await user.save();
 
-        console.log('Adoção excluída com sucesso: ', result._id);
+        console.log('Adoção desfeita com sucesso: ', result._id);
     } catch (error) {
         console.error('Erro:', error);
     }
@@ -95,6 +99,6 @@ async function rejectAll(userId, animalId) {
 
 module.exports = {
     acceptAdopt,
-    deleteAdopt,
+    undoAdopt,
     rejectAll
 };

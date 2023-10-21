@@ -3,7 +3,7 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
-const { acceptAdopt, rejectAll, deleteAdopt } = require('../db_manager/db_client_adopts');
+const { acceptAdopt, rejectAll, undoAdopt } = require('../db_manager/db_client_adopts');
 
 router.post('/accept-adopt', async (req, res) => {
     var userId;
@@ -22,7 +22,7 @@ router.post('/accept-adopt', async (req, res) => {
     }
 });
 
-router.post('/delete-adopt', async (req, res) => {
+router.post('/undo-adopt', async (req, res) => {
     var ngoId;
     var adoptId;
 
@@ -32,10 +32,10 @@ router.post('/delete-adopt', async (req, res) => {
     }
 
     try {
-        await deleteAdopt(adoptId, ngoId);
-        res.status(200).json({ message: 'Adoção deletada com sucesso.' });
+        await undoAdopt(adoptId, ngoId);
+        res.status(200).json({ message: 'Adoção desfeita com sucesso.' });
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao deletar adoção.' });
+        res.status(500).json({ error: 'Erro ao desfazer adoção.' });
     }
 });
 
