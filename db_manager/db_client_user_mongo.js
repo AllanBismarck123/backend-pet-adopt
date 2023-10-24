@@ -7,6 +7,12 @@ mongoose.connect(process.env.MONGO_DB_URI,
     .then(() => console.log('Conexão com o MongoDB estabelecida'))
     .catch(err => console.error('Erro ao conectar ao MongoDB:', err));
 
+const { 
+    notificatorWelcomeNgo, 
+    notificatorEditNgo, 
+    notificatorDeleteNgo 
+} = require('../notificators/notificator_ngo_user');
+
 async function saveUser(data) {
     const dataToInsert = new ModelUserClass(data);
     try {
@@ -14,6 +20,8 @@ async function saveUser(data) {
             console.log("Collection is created!");
         });
         const result = await dataToInsert.save();
+        await notificatorWelcomeNgo(dataToInsert.ngoName, dataToInsert.email);
+
         console.log('Documento inserido com sucesso:', result._id);
     } catch (error) {
         console.error('Erro:', error);
@@ -47,6 +55,7 @@ async function updateUserById(userId, newNgoName, newEmail) {
         user.email = newEmail == null ? user.email : newEmail;
 
         await user.save();
+        await notificatorEditNgo(user.ngoName, user.email);
 
         console.log("Usuário atualizado com sucesso.")
     } catch(error) {
@@ -57,10 +66,18 @@ async function updateUserById(userId, newNgoName, newEmail) {
 async function deleteUserById(userId) {
     try {
         var userObjId = new ObjectId(userId);
+
+        var user = await readUserById(userId);
+
         const result = await ModelUserClass.deleteOne(userObjId);
         if(!result) {
             throw new Error('Documento não encontrado.');
         }
+
+        if(user) {
+            await notificatorDeleteNgo(user.ngoName, user.email);
+        }
+
         console.log("Documento deletado com sucesso:", result);
     } catch (error) {
         console.error('Erro ao deletar o documento:', error);

@@ -1,4 +1,6 @@
-async function notificatorWelcomeNgo(ngoName, userEmail) {
+const { sendEmails } = require('./notificator_config_email');
+
+async function notificatorWelcomeNgo(ngoName, ngoEmail) {
     try {
         var subject = 'Bem-vindo à Plataforma de Adoção de Animais';
     
@@ -54,14 +56,14 @@ async function notificatorWelcomeNgo(ngoName, userEmail) {
         </html>
         `;
     
-        await sendEmails(ngoName, subject, text, html, userEmail);
+        await sendEmails(ngoName, subject, text, html, ngoEmail);
     } catch (error) {
         console.error('Erro ao notificar sobre a criação de usuário:', error);
         throw error;
     }
 }
 
-async function notificatorEditNgo(ngoName, userEmail) {
+async function notificatorEditNgo(ngoName, ngoEmail) {
     try {
         var subject = 'Atenção: Edição de dados';
     
@@ -111,28 +113,22 @@ async function notificatorEditNgo(ngoName, userEmail) {
         </html>
         `;
     
-        await sendEmails(ngoName, subject, text, html, userEmail);
+        await sendEmails(ngoName, subject, text, html, ngoEmail);
     } catch (error) {
-        console.error('Erro ao notificar sobre a edição de usuário:', error);
+        console.error('Erro ao notificar sobre a edição da conta da ONG:', error);
         throw error;
     }
 }
 
-async function notificatorUserDelete(ngoId, userName, userEmail) {
+async function notificatorDeleteNgo(ngoName, ngoEmail) {
     try {
-        // Primeiro, leia a ONG pelo ID
-        const ngo = await readUserById(ngoId);
-
-        // Verifique se a ONG foi encontrada
-        if (!ngo) {
-            throw new Error('ONG não encontrada.');
-        }
 
         const subject = 'Usuário Deletou Sua Conta na Plataforma de Adoção de Animais';
-        const text = `
-            Prezado(a) ${ngo.ngoName},
 
-            Queremos informar que o usuário ${userName} (${userEmail}) deletou sua conta na nossa plataforma de adoção de animais.
+        const text = `
+            Prezado(a) ${ngoName},
+
+            Queremos informar que sua conta foi deletada da nossa plataforma de adoção de animais.
 
             Por favor, esteja ciente dessa alteração em seu sistema.
 
@@ -141,7 +137,7 @@ async function notificatorUserDelete(ngoId, userName, userEmail) {
             Atenciosamente,
             Notificador de E-mails
             Assistente de Adoção
-            ${ngo.ngoName}
+            ${ngoName}
         `;
 
         const html = `
@@ -154,11 +150,11 @@ async function notificatorUserDelete(ngoId, userName, userEmail) {
 
             <body>
                 <p>
-                    <strong>Prezado(a) ${ngo.ngoName},</strong>
+                    <strong>Prezado(a) ${ngoName},</strong>
                 </p>
 
                 <p>
-                    Queremos informar que o usuário ${userName} (${userEmail}) deletou sua conta na nossa plataforma de adoção de animais.
+                    Queremos informar que sua conta foi deletada da nossa plataforma de adoção de animais.
                 </p>
 
                 <p>
@@ -172,18 +168,23 @@ async function notificatorUserDelete(ngoId, userName, userEmail) {
                 <p>Atenciosamente,<br>
                     <em>Notificador de E-mails</em><br>
                     <em>Assistente de Adoção</em><br>
-                    ${ngo.ngoName}
+                    ${ngoName}
                 </p>
             </body>
 
             </html>
         `;
 
-        // Envie o e-mail de notificação
-        await sendEmails(ngo.ngoName, subject, text, html, ngo.email);
+        await sendEmails(ngoName, subject, text, html, ngoEmail);
 
     } catch (error) {
-        console.error('Erro ao notificar sobre a exclusão de usuário:', error);
+        console.error('Erro ao notificar sobre a exclusão da conta da ONG:', error);
         throw error;
     }
+}
+
+module.exports = {
+    notificatorWelcomeNgo,
+    notificatorEditNgo,
+    notificatorDeleteNgo
 }

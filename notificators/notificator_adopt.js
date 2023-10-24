@@ -217,8 +217,13 @@ async function notificatorRejectAdopt(ngoId, request) {
 
 }
 
+async function notificatorUndoAdopt() {
+    // implement
+}
+
 module.exports = {
     notificatorAcceptAdoptUser,
     notificatorAcceptAdoptNgo,
-    notificatorRejectAdopt
+    notificatorRejectAdopt,
+    notificatorUndoAdopt
 };  
