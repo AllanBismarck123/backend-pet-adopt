@@ -13,10 +13,16 @@ async function acceptAdopt(ngoId, requestId) {
 
         var ngo = await readNgoById(ngoId);
         const request = await readRequestById(ngoId, requestId);
-        const animal = await readAnimalById(ngoId, request.animalId);
-        const tutor = request.tutor;
 
-        const dataToInsert = new ModelAdoptClass({ animal: animal, tutor: tutor});
+        if(request == null) {
+            console.log("Requisição não encontrada.");
+            return false;
+        }
+
+        const animal = await readAnimalById(ngoId, request.animalId);
+        const adopter = request.adopter;
+
+        const dataToInsert = new ModelAdoptClass({ animal: animal, adopter: adopter});
 
         await ngo.adopts.push(dataToInsert);
         await ngo.save();
@@ -33,7 +39,7 @@ async function acceptAdopt(ngoId, requestId) {
                     && ngo.requestsAdopts[index].animalId.toString() 
                     === request.animalId.toString()
                 ) {
-                    if(tutor.cpf !== ngo.requestsAdopts[index].tutor.cpf) {
+                    if(adopter.cpf !== ngo.requestsAdopts[index].adopter.cpf) {
                         await notificatorRejectAdopt(ngoId, ngo.requestsAdopts[index]);
                     }
                     ngo.requestsAdopts.splice(index, 1);
@@ -52,8 +58,10 @@ async function acceptAdopt(ngoId, requestId) {
         await notificatorAcceptAdoptNgo(ngoId, dataToInsert);
 
         console.log('Documento inserido com sucesso:', result._id);
+        return true;
     } catch (error) {
         console.error('Erro:', error);
+        return false;
     }
 }
 

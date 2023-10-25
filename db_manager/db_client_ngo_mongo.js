@@ -79,9 +79,14 @@ async function deleteNgoById(ngoId) {
         }
 
         console.log("Documento deletado com sucesso:", result);
+        if(result.deletedCount > 0) {
+            return true;
+        } else {
+            return false;
+        }   
     } catch (error) {
         console.error('Erro ao deletar o documento:', error);
-        return null;
+        return false;
     }
 }
 

@@ -3,19 +3,20 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
-const { 
+const {
     saveRequestAdopt,
     readRequestsAdopt,
     readRequestById,
     deleteRequestByAdopter
 } = require('../db_manager/db_client_requests_adopt');
 
-const { 
-    notificatorSendRequestAdopter, 
-    notificatorSendRequestNgo  
+const {
+    notificatorSendRequestAdopter,
+    notificatorSendRequestNgo
 } = require('../notificators/notificator_request');
 
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
+const { readAnimalById } = require('../db_manager/db_client_animals');
 
 const adopter = {
     urlImageTutor: "",
@@ -38,7 +39,7 @@ router.post('/create-request', async (req, res) => {
     var ngoId;
     var animalId;
 
-    if(req.body) {
+    if (req.body) {
         // adopter = req.body.adopter;
         ngoId = req.body.ngoId;
         animalId = req.body.animalId;
@@ -56,6 +57,7 @@ router.post('/create-request', async (req, res) => {
         await saveRequestAdopt(adopter, animalId, ngoId);
 
         const request = new ModelRequestAdoptClass({ adopter: adopter, animalId: animalId });
+        
         await notificatorSendRequestAdopter(request, ngoId);
         await notificatorSendRequestNgo(request, ngoId);
 
@@ -101,7 +103,7 @@ router.delete('/delete-request', async (req, res) => {
     var ngoId;
     var requestId;
 
-    if(req.body) {
+    if (req.body) {
         ngoId = req.body.ngoId;
         requestId = req.body.requestId;
     }

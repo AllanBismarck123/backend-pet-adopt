@@ -79,7 +79,7 @@ async function notificatorAcceptAdoptAdopter(ngoId, adopt) {
 
 async function notificatorAcceptAdoptNgo(ngoId, adopt) {
     try {
-        var ngo = await readUserById(ngoId);
+        var ngo = await readNgoById(ngoId);
     
         var subject = 'Confirmação de Aceitação de Solicitação de Adoção';
     

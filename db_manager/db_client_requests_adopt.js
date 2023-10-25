@@ -48,7 +48,7 @@ async function readRequestById(ngoId, requestId) {
     }
 }
 
-async function deleteRequestByNgo(ngoId, requestId) {
+async function deleteRequestByAdopter(ngoId, requestId) {
 
     try {
         var ngo = await readNgoById(ngoId);
@@ -83,5 +83,5 @@ module.exports = {
     saveRequestAdopt,
     readRequestsAdopt,
     readRequestById,
-    deleteRequestByNgo
+    deleteRequestByAdopter
 };

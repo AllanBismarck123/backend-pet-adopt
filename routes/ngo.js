@@ -105,8 +105,12 @@ router.delete('/delete-ngo', async (req, res) => {
   }
 
   try {
-    await deleteNgoById(ngoId);
-    res.json({ message: 'Conta da ONG deletada com sucesso.' });
+    var result = await deleteNgoById(ngoId);
+    if(result == false) {
+      res.status(404).json({ error: 'ONG não encontrada.' });
+    } else {
+      res.json({ message: 'Conta da ONG deletada com sucesso.' });
+    }
   } catch (error) {
     res.status(500).json({ error: 'Erro ao deletar conta da ONG.' });
   }

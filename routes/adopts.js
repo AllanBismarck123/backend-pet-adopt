@@ -15,8 +15,12 @@ router.post('/accept-adopt', async (req, res) => {
     }
 
     try {
-        await acceptAdopt(ngoId, requestId);
-        res.status(200).json({ message: 'Adoção aceita com sucesso.' });
+        const result = await acceptAdopt(ngoId, requestId);
+        if(result) {
+            res.status(200).json({ message: 'Adoção aceita com sucesso.' });
+        } else {
+            res.status(404).json({ message: 'Requisição não encontrada.' });
+        }
     } catch (error) {
         res.status(500).json({ error: 'Erro ao aceitar adoção.' });
     }
@@ -39,7 +43,7 @@ router.post('/undo-adopt', async (req, res) => {
     }
 });
 
-router.post('/reject-all-adopts', async (req, res) => {
+router.post('/reject-all-requests', async (req, res) => {
     var ngoId;
     var animalId;
 
