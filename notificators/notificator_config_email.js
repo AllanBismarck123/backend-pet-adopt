@@ -2,9 +2,6 @@
 require('dotenv').config({ path: '.env.cred' });
 const nodemailer = require("nodemailer");
 
-const { readUserById } = require('../db_manager/db_client_user_mongo');
-const { readAnimalById } = require('../db_manager/db_client_animals');
-
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,

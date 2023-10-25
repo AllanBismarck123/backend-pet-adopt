@@ -7,17 +7,17 @@ const {
     saveRequestAdopt,
     readRequestsAdopt,
     readRequestById,
-    deleteRequestByUser
+    deleteRequestByAdopter
 } = require('../db_manager/db_client_requests_adopt');
 
 const { 
-    notificatorSendRequestUser, 
+    notificatorSendRequestAdopter, 
     notificatorSendRequestNgo  
 } = require('../notificators/notificator_request');
 
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 
-const tutor = {
+const adopter = {
     urlImageTutor: "",
     tutorName: "Nome do tutor 2",
     cpf: "Cpf do tutor2",
@@ -34,12 +34,12 @@ const tutor = {
 
 router.post('/create-request', async (req, res) => {
 
-    // var tutor;
+    // var adopter;
     var ngoId;
     var animalId;
 
     if(req.body) {
-        // tutor = req.body.tutor;
+        // adopter = req.body.adopter;
         ngoId = req.body.ngoId;
         animalId = req.body.animalId;
     }
@@ -47,16 +47,16 @@ router.post('/create-request', async (req, res) => {
     try {
         var requests = await readRequestsAdopt(ngoId);
 
-        const existingRequest = requests.find((element) => element.tutor.cpf === tutor.cpf && element.animalId === animalId);
+        const existingRequest = requests.find((element) => element.adopter.cpf === adopter.cpf && element.animalId === animalId);
 
         if (existingRequest) {
             return res.status(400).json({ message: 'Você já fez uma solicitação de adoção para esse animal, aguarde o andamento do processo de adoção.' });
         }
 
-        await saveRequestAdopt(tutor, animalId, ngoId);
+        await saveRequestAdopt(adopter, animalId, ngoId);
 
-        const request = new ModelRequestAdoptClass({ tutor: tutor, animalId: animalId });
-        await notificatorSendRequestUser(request, ngoId);
+        const request = new ModelRequestAdoptClass({ adopter: adopter, animalId: animalId });
+        await notificatorSendRequestAdopter(request, ngoId);
         await notificatorSendRequestNgo(request, ngoId);
 
         res.status(200).json({ message: 'Requisição de adoção realizada com sucesso.' });
@@ -81,16 +81,16 @@ router.get('/all-requests', async (req, res) => {
 });
 
 router.get('/read-request', async (req, res) => {
-    var userId;
+    var ngoId;
     var requestId;
 
     if (req.body) {
-        userId = req.body.userId;
+        ngoId = req.body.ngoId;
         requestId = req.body.requestId
     }
 
     try {
-        const data = await readRequestById(userId, requestId);
+        const data = await readRequestById(ngoId, requestId);
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler requisição.' });
@@ -111,7 +111,7 @@ router.delete('/delete-request', async (req, res) => {
     }
 
     try {
-        var result = await deleteRequestByUser(ngoId, requestId);
+        var result = await deleteRequestByAdopter(ngoId, requestId);
         res.json({ message: result });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao deletar requisição.' });

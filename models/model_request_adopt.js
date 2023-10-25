@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 
-const { modelTutorObj } = require('./model_tutor');
+const { modelAdopterObj } = require('./model_adopter');
 
 class modelRequestAdopt {
-    constructor(tutor, animalId, ngoId) {
-        this.tutor = tutor;
+    constructor(adopter, animalId, ngoId) {
+        this.adopter = adopter;
         this.animalId = animalId;
     }
 }
 
 const modelRequestAdoptObj = mongoose.Schema({
-    tutor: modelTutorObj,
+    adopter: modelAdopterObj,
     animalId: String
 });
 

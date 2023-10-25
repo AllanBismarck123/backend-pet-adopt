@@ -6,16 +6,16 @@ const mongoose = require('mongoose');
 const { acceptAdopt, rejectAll, undoAdopt } = require('../db_manager/db_client_adopts');
 
 router.post('/accept-adopt', async (req, res) => {
-    var userId;
+    var ngoId;
     var requestId;
 
     if(req.body) {
-        userId = req.body.userId;
+        ngoId = req.body.ngoId;
         requestId = req.body.requestId;
     }
 
     try {
-        await acceptAdopt(userId, requestId);
+        await acceptAdopt(ngoId, requestId);
         res.status(200).json({ message: 'Adoção aceita com sucesso.' });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao aceitar adoção.' });
@@ -40,16 +40,16 @@ router.post('/undo-adopt', async (req, res) => {
 });
 
 router.post('/reject-all-adopts', async (req, res) => {
-    var userId;
+    var ngoId;
     var animalId;
 
     if(req.body) {
-        userId = req.body.userId;
+        ngoId = req.body.ngoId;
         animalId = req.body.animalId;
     }
 
     try {
-        await rejectAll(userId, animalId);
+        await rejectAll(ngoId, animalId);
         res.status(200).json({ message: 'Solicitações de adoção deletadas com sucesso.' });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao deletar adoções.' });

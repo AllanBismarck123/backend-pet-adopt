@@ -7,8 +7,8 @@ const {
     saveAnimal, 
     readAnimals, 
     readAnimalById, 
-    updateAnimalByUser, 
-    deleteAnimalByUser
+    updateAnimalByNgo, 
+    deleteAnimalByNgo
 } = require('../db_manager/db_client_animals');
 
 const animal = {
@@ -22,10 +22,14 @@ const animal = {
 }
 
 router.post('/create-animal', async (req, res) => {
-    const userId = req.body.id;
+    var ngoId;
+    
+    if(req.body) {
+        ngoId = req.body.ngoId;
+    }
 
     try {
-        await saveAnimal(userId, animal);
+        await saveAnimal(ngoId, animal);
         res.status(200).json({ message: 'Animal cadastrado com sucesso.' });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao cadastrar animal.' });
@@ -33,14 +37,14 @@ router.post('/create-animal', async (req, res) => {
 });
 
 router.get('/all-animals', async (req, res) => {
-    var userId;
+    var ngoId;
 
     if (req.body) {
-        userId = req.body.id;
+        ngoId = req.body.ngoId;
     }
 
     try {
-        const data = await readAnimals(userId);
+        const data = await readAnimals(ngoId);
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animais.' });
@@ -48,16 +52,16 @@ router.get('/all-animals', async (req, res) => {
 });
 
 router.get('/read-animal', async (req, res) => {
-    var userId;
+    var ngoId;
     var animalId;
 
     if (req.body) {
-        userId = req.body.userId;
+        ngoId = req.body.ngoId;
         animalId = req.body.animalId
     }
 
     try {
-        const data = await readAnimalById(userId, animalId);
+        const data = await readAnimalById(ngoId, animalId);
         res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animal.' });
@@ -66,7 +70,7 @@ router.get('/read-animal', async (req, res) => {
 
 router.put('/update-animal', async (req, res) => {
 
-    var userId;
+    var ngoId;
     var newAnimal;
     var destAnimalId;
     var urlImageAnimal;
@@ -78,7 +82,7 @@ router.put('/update-animal', async (req, res) => {
     var sex;
 
     if (req.body) {
-        userId = req.body.userId;
+        ngoId = req.body.ngoId;
         destAnimalId = req.body.destAnimalId;
         newAnimal = req.body.newAnimal;
 
@@ -90,8 +94,8 @@ router.put('/update-animal', async (req, res) => {
         specialCondition = newAnimal.specialCondition;
         sex = newAnimal.sex;
 
-        if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(destAnimalId)) {
-            return res.status(400).json({ error: 'ID de usuário ou animal inválido.' });
+        if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(destAnimalId)) {
+            return res.status(400).json({ error: 'ID da ONG ou do animal inválido.' });
         }
 
         if (
@@ -109,7 +113,7 @@ router.put('/update-animal', async (req, res) => {
     }
 
     try {
-        var result = await updateAnimalByUser(userId, destAnimalId, newAnimal);
+        var result = await updateAnimalByNgo(ngoId, destAnimalId, newAnimal);
         res.status(200).json({ message: result });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao atualizar o animal.' });
@@ -118,20 +122,20 @@ router.put('/update-animal', async (req, res) => {
 });
 
 router.delete('/delete-animal', async (req, res) => {
-    var userId;
+    var ngoId;
     var animalId;
 
     if(req.body) {
-        userId = req.body.userId;
+        ngoId = req.body.ngoId;
         animalId = req.body.animalId;
     }
 
-    if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(animalId)) {
-        return res.status(400).json({ error: 'ID do usuário ou do animal inválido.' });
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
+        return res.status(400).json({ error: 'ID da ONG ou do animal inválido.' });
     }
 
     try {
-        var result = await deleteAnimalByUser(userId, animalId);
+        var result = await deleteAnimalByNgo(ngoId, animalId);
         res.json({ message: result });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao deletar animal.' });

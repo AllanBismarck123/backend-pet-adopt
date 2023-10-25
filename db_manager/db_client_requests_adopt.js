@@ -1,18 +1,18 @@
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
-const { readUserById } = require('./db_client_user_mongo');
+const { readNgoById } = require('./db_client_ngo_mongo');
 
 const { 
     notificatorRejectAdopt  
 } = require('../notificators/notificator_adopt');
 
-async function saveRequestAdopt(tutor, animalId, ngoId) {
+async function saveRequestAdopt(adopter, animalId, ngoId) {
     try {
-        const dataToInsert = new ModelRequestAdoptClass({ tutor: tutor, animalId: animalId });
-        var user = await readUserById(ngoId);
+        const dataToInsert = new ModelRequestAdoptClass({ adopter: adopter, animalId: animalId });
+        var ngo = await readNgoById(ngoId);
 
-        user.requestsAdopts.push(dataToInsert);
+        ngo.requestsAdopts.push(dataToInsert);
 
-        const result = await user.save();
+        const result = await ngo.save();
         console.log('Documento inserido com sucesso:', result._id);
     } catch (error) {
         console.error('Erro:', error);
@@ -21,24 +21,24 @@ async function saveRequestAdopt(tutor, animalId, ngoId) {
 
 async function readRequestsAdopt(ngoId) {
     try {
-        const user = await readUserById(ngoId);
-        return user.requestsAdopts;
+        const ngo = await readNgoById(ngoId);
+        return ngo.requestsAdopts;
     } catch (error) {
         console.error('Erro:', error);
         return [];
     }
 }
 
-async function readRequestById(userId, requestId) {
+async function readRequestById(ngoId, requestId) {
     try {
 
-        const user = await readUserById(userId);
+        const ngo = await readNgoById(ngoId);
 
-        if (user != null && requestId != null) {
-            var requestsAdopts = user.requestsAdopts;
+        if (ngo != null && requestId != null) {
+            var requestsAdopts = ngo.requestsAdopts;
             const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
 
-            return user.requestsAdopts[index];
+            return ngo.requestsAdopts[index];
         }
 
         return [];
@@ -48,21 +48,21 @@ async function readRequestById(userId, requestId) {
     }
 }
 
-async function deleteRequestByUser(userId, requestId) {
+async function deleteRequestByNgo(ngoId, requestId) {
 
     try {
-        var user = await readUserById(userId);
+        var ngo = await readNgoById(ngoId);
 
-        if (user != null && requestId != null) {
-            var requestsAdopts = user.requestsAdopts;
+        if (ngo != null && requestId != null) {
+            var requestsAdopts = ngo.requestsAdopts;
 
             const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
 
             if (index >= 0) {
-                await notificatorRejectAdopt(userId, user.requestsAdopts[index]);
+                await notificatorRejectAdopt(ngoId, ngo.requestsAdopts[index]);
                 
-                user.requestsAdopts.splice(index, 1);
-                await user.save();
+                ngo.requestsAdopts.splice(index, 1);
+                await ngo.save();
 
                 console.log("Requisição deletada com sucesso.");
                 return "Requisição deletada com sucesso.";
@@ -83,5 +83,5 @@ module.exports = {
     saveRequestAdopt,
     readRequestsAdopt,
     readRequestById,
-    deleteRequestByUser
+    deleteRequestByNgo
 };

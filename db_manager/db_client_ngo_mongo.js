@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { ModelUserClass } = require('../models/model_user');
+const { ModelNgoClass } = require('../models/model_ngo');
 const { ObjectId } = require('mongodb');
 
 mongoose.connect(process.env.MONGO_DB_URI,
@@ -11,12 +11,12 @@ const {
     notificatorWelcomeNgo, 
     notificatorEditNgo, 
     notificatorDeleteNgo 
-} = require('../notificators/notificator_ngo_user');
+} = require('../notificators/notificator_ngo_adopter');
 
-async function saveUser(data) {
-    const dataToInsert = new ModelUserClass(data);
+async function saveNgo(data) {
+    const dataToInsert = new ModelNgoClass(data);
     try {
-        ModelUserClass.createCollection().then((collection) => {
+        ModelNgoClass.createCollection().then((collection) => {
             console.log("Collection is created!");
         });
         const result = await dataToInsert.save();
@@ -28,9 +28,9 @@ async function saveUser(data) {
     }
 }
 
-async function readUser() {
+async function readNgo() {
     try {
-        const data = await ModelUserClass.find().exec();
+        const data = await ModelNgoClass.find().exec();
         return data;
     } catch (error) {
         console.error('Erro:', error);
@@ -38,24 +38,24 @@ async function readUser() {
     }
 }
 
-async function readUserById(userId) {
+async function readNgoById(ngoId) {
     try {
-        const user = await ModelUserClass.findById(userId).exec();
-        return user;
+        const ngo = await ModelNgoClass.findById(ngoId).exec();
+        return ngo;
     } catch (error) {
         console.error('Erro:', error);
         return null;
     }
 }
 
-async function updateUserById(userId, newNgoName, newEmail) {
+async function updateNgoById(ngoId, newNgoName, newEmail) {
     try {
-        var user = await readUserById(userId);
-        user.ngoName = newNgoName == null ? user.ngoName : newNgoName;
-        user.email = newEmail == null ? user.email : newEmail;
+        var ngo = await readNgoById(ngoId);
+        ngo.ngoName = newNgoName == null ? ngo.ngoName : newNgoName;
+        ngo.email = newEmail == null ? ngo.email : newEmail;
 
-        await user.save();
-        await notificatorEditNgo(user.ngoName, user.email);
+        await ngo.save();
+        await notificatorEditNgo(ngo.ngoName, ngo.email);
 
         console.log("Usuário atualizado com sucesso.")
     } catch(error) {
@@ -63,19 +63,19 @@ async function updateUserById(userId, newNgoName, newEmail) {
     }
 }
 
-async function deleteUserById(userId) {
+async function deleteNgoById(ngoId) {
     try {
-        var userObjId = new ObjectId(userId);
+        var ngoObjId = new ObjectId(ngoId);
 
-        var user = await readUserById(userId);
+        var ngo = await readNgoById(ngoId);
 
-        const result = await ModelUserClass.deleteOne(userObjId);
+        const result = await ModelNgoClass.deleteOne(ngoObjId);
         if(!result) {
             throw new Error('Documento não encontrado.');
         }
 
-        if(user) {
-            await notificatorDeleteNgo(user.ngoName, user.email);
+        if(ngo) {
+            await notificatorDeleteNgo(ngo.ngoName, ngo.email);
         }
 
         console.log("Documento deletado com sucesso:", result);
@@ -86,9 +86,9 @@ async function deleteUserById(userId) {
 }
 
 module.exports = {
-    saveUser,
-    readUser,
-    readUserById,
-    updateUserById,
-    deleteUserById
+    saveNgo,
+    readNgo,
+    readNgoById,
+    updateNgoById,
+    deleteNgoById
 };

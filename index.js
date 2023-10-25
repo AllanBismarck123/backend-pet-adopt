@@ -13,6 +13,4 @@ const port = 4000;
 
 app.use('/ngo', ngo);
 
-//Falta criar rota de deletar adoção
-
 app.listen(port, hostname);

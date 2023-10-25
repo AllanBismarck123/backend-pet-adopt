@@ -1,41 +1,41 @@
 const { ModelAnimalClass } = require('../models/model_animal');
-const { readUserById } = require('./db_client_user_mongo');
+const { readNgoById } = require('./db_client_ngo_mongo');
 
-async function saveAnimal(userId, data) {
+async function saveAnimal(ngoId, data) {
     try {
         const dataToInsert = new ModelAnimalClass(data);
-        var user = await readUserById(userId);
+        var ngo = await readNgoById(ngoId);
 
-        user.animals.push(dataToInsert);
+        ngo.animals.push(dataToInsert);
 
-        const result = await user.save();
+        const result = await ngo.save();
         console.log('Documento inserido com sucesso:', result._id);
     } catch (error) {
         console.error('Erro:', error);
     }
 }
 
-async function readAnimals(userId) {
+async function readAnimals(ngoId) {
     try {
-        const user = await readUserById(userId);
-        return user.animals;
+        const ngo = await readNgoById(ngoId);
+        return ngo.animals;
     } catch (error) {
         console.error('Erro:', error);
         return [];
     }
 }
 
-async function readAnimalById(userId, animalId) {
+async function readAnimalById(ngoId, animalId) {
 
     try {
 
-        const user = await readUserById(userId);
+        const ngo = await readNgoById(ngoId);
 
-        if (user != null && animalId != null) {
-            var animals = user.animals;
+        if (ngo != null && animalId != null) {
+            var animals = ngo.animals;
             const index = animals.findIndex((animal) => animal._id.toString() === animalId.toString());
 
-            return user.animals[index];
+            return ngo.animals[index];
         }
 
         return [];
@@ -45,11 +45,11 @@ async function readAnimalById(userId, animalId) {
     }
 }
 
-async function updateAnimalByUser(userId, destAnimalId, newAnimal) {
+async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
     try {
-        var user = await readUserById(userId);
+        var ngo = await readNgoById(ngoId);
         if (newAnimal != null) {
-            var animals = user.animals;
+            var animals = ngo.animals;
             var find = false;
 
             animals.forEach((i) => {
@@ -67,8 +67,8 @@ async function updateAnimalByUser(userId, destAnimalId, newAnimal) {
             });
 
             if (find) {
-                user.animals = animals;
-                await user.save();
+                ngo.animals = animals;
+                await ngo.save();
 
                 console.log("Animal atualizado com sucesso.");
                 return "Animal atualizado com sucesso.";
@@ -85,18 +85,18 @@ async function updateAnimalByUser(userId, destAnimalId, newAnimal) {
     }
 }
 
-async function deleteAnimalByUser(userId, animalId) {
+async function deleteAnimalByNgo(ngoId, animalId) {
 
     try {
-        var user = await readUserById(userId);
-        if (user != null && animalId != null) {
-            var animals = user.animals;
+        var ngo = await readNgoById(ngoId);
+        if (ngo != null && animalId != null) {
+            var animals = ngo.animals;
 
             const index = animals.findIndex((animal) => animal._id.toString() === animalId.toString());
 
             if (index >= 0) {
-                user.animals.splice(index, 1);
-                await user.save();
+                ngo.animals.splice(index, 1);
+                await ngo.save();
 
                 console.log("Animal deletado com sucesso.");
                 return "Animal deletado com sucesso.";
@@ -117,6 +117,6 @@ module.exports = {
     saveAnimal,
     readAnimals,
     readAnimalById,
-    updateAnimalByUser,
-    deleteAnimalByUser
+    updateAnimalByNgo,
+    deleteAnimalByNgo
 };

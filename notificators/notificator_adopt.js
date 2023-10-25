@@ -1,13 +1,16 @@
 const { sendEmails } = require('./notificator_config_email');
 
-async function notificatorAcceptAdoptUser(ngoId, adopt) {
+const { readNgoById } = require('../db_manager/db_client_ngo_mongo');
+const { readAnimalById } = require('../db_manager/db_client_animals');
+
+async function notificatorAcceptAdoptAdopter(ngoId, adopt) {
     try {
-        var ngo = await readUserById(ngoId);
+        var ngo = await readNgoById(ngoId);
     
         var subject = 'Sua Solicitação de Adoção foi Aceita!';
     
         var text = `
-          Prezado(a) [${adopt.tutor.tutorName}],
+          Prezado(a) [${adopt.adopter.adopterName}],
       
           Temos o prazer de informar que sua solicitação de adoção foi aceita pela ONG [${ngo.ngoName}]! Você está prestes a dar um novo lar amoroso a [${adopt.animal.animalName}].
           
@@ -40,7 +43,7 @@ async function notificatorAcceptAdoptUser(ngoId, adopt) {
         <body>
             <p><strong>Assunto: Sua Solicitação de Adoção foi Aceita!</strong></p>
       
-            <p>Prezado(a) [${adopt.tutor.tutorName}],</p>
+            <p>Prezado(a) [${adopt.adopter.adopterName}],</p>
       
             <p>Temos o prazer de informar que sua solicitação de adoção foi aceita pela ONG [${ngo.ngoName}]! Você está prestes a dar um novo lar amoroso a [${adopt.animal.animalName}].</p>
       
@@ -66,7 +69,7 @@ async function notificatorAcceptAdoptUser(ngoId, adopt) {
         </html>
         `;
     
-        await sendEmails(ngo.ngoName, subject, text, html, adopt.tutor.email);
+        await sendEmails(ngo.ngoName, subject, text, html, adopt.adopter.email);
     } catch (error) {
         console.error('Erro ao notificar sobre a confirmação de adoção ao tutor:', error);
         throw error;
@@ -83,9 +86,9 @@ async function notificatorAcceptAdoptNgo(ngoId, adopt) {
         var text = `
           Prezados Membros da Equipe da ONG [${ngo.ngoName}],
       
-          Gostaríamos de informar que a solicitação de adoção para o animal [${adopt.animal.animalName}] foi aceita. O usuário [${adopt.tutor.tutorName}] demonstrou interesse em adotar o animal e nós aprovamos a solicitação.
+          Gostaríamos de informar que a solicitação de adoção para o animal [${adopt.animal.animalName}] foi aceita. O usuário [${adopt.adopter.adopterName}] demonstrou interesse em adotar o animal e nós aprovamos a solicitação.
           
-          Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário [${adopt.tutor.tutorName}] o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.
+          Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário [${adopt.adopter.adopterName}] o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.
           
           Lembramos que a segurança e o bem-estar do animal são nossa prioridade. Certifique-se de seguir nossos procedimentos padrão de adoção e garantir que o novo lar seja adequado para o animal.
           
@@ -113,11 +116,11 @@ async function notificatorAcceptAdoptNgo(ngoId, adopt) {
             </p>
       
             <p>
-                Gostaríamos de informar que a solicitação de adoção para o animal <strong>[${adopt.animal.animalName}]</strong> foi aceita. O usuário <strong>[${adopt.tutor.tutorName}]</strong> demonstrou interesse em adotar o animal e nós aprovamos a solicitação.
+                Gostaríamos de informar que a solicitação de adoção para o animal <strong>[${adopt.animal.animalName}]</strong> foi aceita. O usuário <strong>[${adopt.adopter.adopterName}]</strong> demonstrou interesse em adotar o animal e nós aprovamos a solicitação.
             </p>
       
             <p>
-                Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário <strong>[${adopt.tutor.tutorName}]</strong> o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.
+                Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário <strong>[${adopt.adopter.adopterName}]</strong> o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.
             </p>
       
             <p>
@@ -153,12 +156,12 @@ async function notificatorAcceptAdoptNgo(ngoId, adopt) {
 async function notificatorRejectAdopt(ngoId, request) {
     try {
         var animal = await readAnimalById(ngoId, request.animalId);
-        var ngo = await readUserById(ngoId);
+        var ngo = await readNgoById(ngoId);
     
         var subject = 'Recusa da Solicitação de Adoção para [Nome do Animal]';
     
         var text = `
-          Prezado [${request.tutor.tutorName}],
+          Prezado [${request.adopter.adopterName}],
       
           Lamentamos informar que sua solicitação de adoção para o animal [${animal.animalName}] foi recusada pela ONG [${ngo.ngoName}]. Agradecemos por seu interesse em adotar um animal e por considerar a adoção como uma opção.
           
@@ -184,7 +187,7 @@ async function notificatorRejectAdopt(ngoId, request) {
       
         <body>
             <p>
-                <strong>Prezado(a) [${request.tutor.tutorName}],</strong>
+                <strong>Prezado(a) [${request.adopter.adopterName}],</strong>
             </p>
       
             <p>
@@ -209,7 +212,7 @@ async function notificatorRejectAdopt(ngoId, request) {
         </html>
         `;
     
-        await sendEmails(ngo.ngoName, subject, text, html, request.tutor.email);
+        await sendEmails(ngo.ngoName, subject, text, html, request.adopter.email);
     } catch (error) {
         console.error('Erro ao notificar sobre a rejeição da solicitação de adoção ao tutor:', error);
         throw error;
@@ -222,7 +225,7 @@ async function notificatorUndoAdopt() {
 }
 
 module.exports = {
-    notificatorAcceptAdoptUser,
+    notificatorAcceptAdoptAdopter,
     notificatorAcceptAdoptNgo,
     notificatorRejectAdopt,
     notificatorUndoAdopt

@@ -1,43 +1,43 @@
 const { ModelAdoptClass } = require('../models/model_adopt');
-const { readAnimalById, deleteAnimalByUser } = require('./db_client_animals');
-const { readRequestById, deleteRequestByUser } = require('./db_client_requests_adopt');
-const { readUserById } = require('./db_client_user_mongo');
+const { readAnimalById, deleteAnimalByNgo } = require('./db_client_animals');
+const { readRequestById } = require('./db_client_requests_adopt');
+const { readNgoById } = require('./db_client_ngo_mongo');
 const { 
-    notificatorAcceptAdoptUser, 
+    notificatorAcceptAdoptAdopter, 
     notificatorAcceptAdoptNgo, 
     notificatorRejectAdopt 
 } = require('../notificators/notificator_adopt');
 
-async function acceptAdopt(userId, requestId) {
+async function acceptAdopt(ngoId, requestId) {
     try {
 
-        var user = await readUserById(userId);
-        const request = await readRequestById(userId, requestId);
-        const animal = await readAnimalById(userId, request.animalId);
+        var ngo = await readNgoById(ngoId);
+        const request = await readRequestById(ngoId, requestId);
+        const animal = await readAnimalById(ngoId, request.animalId);
         const tutor = request.tutor;
 
         const dataToInsert = new ModelAdoptClass({ animal: animal, tutor: tutor});
 
-        await user.adopts.push(dataToInsert);
-        await user.save();
+        await ngo.adopts.push(dataToInsert);
+        await ngo.save();
 
-        user = await readUserById(userId);
-        var length = user.requestsAdopts.length;
+        ngo = await readNgoById(ngoId);
+        var length = ngo.requestsAdopts.length;
 
         if(length > 0) {
             var index = 0;
             while(index < length) {
                 if( 
-                    user.requestsAdopts[index] 
-                    && user.requestsAdopts[index].animalId 
-                    && user.requestsAdopts[index].animalId.toString() 
+                    ngo.requestsAdopts[index] 
+                    && ngo.requestsAdopts[index].animalId 
+                    && ngo.requestsAdopts[index].animalId.toString() 
                     === request.animalId.toString()
                 ) {
-                    if(tutor.cpf !== user.requestsAdopts[index].tutor.cpf) {
-                        await notificatorRejectAdopt(userId, user.requestsAdopts[index]);
+                    if(tutor.cpf !== ngo.requestsAdopts[index].tutor.cpf) {
+                        await notificatorRejectAdopt(ngoId, ngo.requestsAdopts[index]);
                     }
-                    user.requestsAdopts.splice(index, 1);
-                    await user.save();
+                    ngo.requestsAdopts.splice(index, 1);
+                    await ngo.save();
                     index--;
                     length--;
                 }
@@ -45,11 +45,11 @@ async function acceptAdopt(userId, requestId) {
             }
         }
 
-        await deleteAnimalByUser(userId, request.animalId);
+        await deleteAnimalByNgo(ngoId, request.animalId);
 
-        const result = await user.save();
-        await notificatorAcceptAdoptUser(userId, dataToInsert);
-        await notificatorAcceptAdoptNgo(userId, dataToInsert);
+        const result = await ngo.save();
+        await notificatorAcceptAdoptAdopter(ngoId, dataToInsert);
+        await notificatorAcceptAdoptNgo(ngoId, dataToInsert);
 
         console.log('Documento inserido com sucesso:', result._id);
     } catch (error) {
@@ -60,19 +60,19 @@ async function acceptAdopt(userId, requestId) {
 async function undoAdopt(adoptId, ngoId) {
     try {
 
-        var user = await readUserById(ngoId);
+        var ngo = await readNgoById(ngoId);
 
-        const adopt = user.adopts.filter(adopt => adopt._id.toString() === adoptId);
+        const adopt = ngo.adopts.filter(adopt => adopt._id.toString() === adoptId);
         const animal = adopt[0].animal;
         console.log(animal);
 
-        const updatedAdopts = user.adopts.filter(adopt => adopt._id.toString() !== adoptId);
+        const updatedAdopts = ngo.adopts.filter(adopt => adopt._id.toString() !== adoptId);
 
-        user.animals.push(animal);
+        ngo.animals.push(animal);
 
-        user.adopts = updatedAdopts;
+        ngo.adopts = updatedAdopts;
 
-        const result = await user.save();
+        const result = await ngo.save();
 
         console.log('Adoção desfeita com sucesso: ', result._id);
     } catch (error) {
@@ -80,16 +80,16 @@ async function undoAdopt(adoptId, ngoId) {
     }
 }
 
-async function rejectAll(userId, animalId) {
+async function rejectAll(ngoId, animalId) {
     try {
 
-        var user = await readUserById(userId);
+        var ngo = await readNgoById(ngoId);
 
-        const updatedRequests = user.requestsAdopts.filter(request => request.animalId !== animalId);
+        const updatedRequests = ngo.requestsAdopts.filter(request => request.animalId !== animalId);
 
-        user.requestsAdopts = updatedRequests;
+        ngo.requestsAdopts = updatedRequests;
 
-        const result = await user.save();
+        const result = await ngo.save();
 
         console.log('Lista de adoções excluída com sucesso: ', result._id);
     } catch (error) {

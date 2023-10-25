@@ -1,14 +1,17 @@
 const { sendEmails } = require('./notificator_config_email');
 
-async function notificatorSendRequestUser(request, ngoId) {
+const { readNgoById } = require('../db_manager/db_client_ngo_mongo');
+const { readAnimalById } = require('../db_manager/db_client_animals');
+
+async function notificatorSendRequestAdopter(request, ngoId) {
     try {
         var animal = await readAnimalById(ngoId, request.animalId);
-        var ngo = await readUserById(ngoId);
+        var ngo = await readNgoById(ngoId);
       
         var subject = 'Solicitação de Adoção de Animal';
       
         var text = `
-          Prezado [${request.tutor.tutorName}],
+          Prezado [${request.adopter.adopterName}],
       
           Obrigado por demonstrar interesse em adotar um animal em nossa plataforma de adoção de animais. Valorizamos seu comprometimento em fornecer um lar amoroso a um de nossos animais necessitados.
           
@@ -33,7 +36,7 @@ async function notificatorSendRequestUser(request, ngoId) {
         </head>
         
         <body>
-            <p>Prezado <strong>[${request.tutor.tutorName}]</strong>,</p>
+            <p>Prezado <strong>[${request.adopter.adopterName}]</strong>,</p>
         
             <p>Obrigado por demonstrar interesse em adotar um animal em nossa plataforma de adoção de animais. Valorizamos seu comprometimento em fornecer um lar amoroso a um de nossos animais necessitados.</p>
         
@@ -53,7 +56,7 @@ async function notificatorSendRequestUser(request, ngoId) {
         </html>  
         `;
       
-        await sendEmails(ngo.ngoName, subject, text, html, request.tutor.email);
+        await sendEmails(ngo.ngoName, subject, text, html, request.adopter.email);
     } catch (error) {
         console.error('Erro ao notificar sobre a solicitação de adoção ao tutor:', error);
         throw error;
@@ -64,16 +67,16 @@ async function notificatorSendRequestUser(request, ngoId) {
   async function notificatorSendRequestNgo(request, ngoId) {
     try {
         var animal = await readAnimalById(ngoId, request.animalId);
-        var ngo = await readUserById(ngoId);
+        var ngo = await readNgoById(ngoId);
       
         var subject = 'Nova Solicitação de Adoção';
       
         var text = `
           Prezados Membros da Equipe da ONG [${ngo.ngoName}],
       
-          Gostaríamos de informar que uma nova solicitação de adoção foi recebida em nossa plataforma. O usuário [${request.tutor.tutorName}] demonstrou interesse em adotar o animal [${animal.animalName}] sob os cuidados da nossa organização.
+          Gostaríamos de informar que uma nova solicitação de adoção foi recebida em nossa plataforma. O usuário [${request.adopter.adopterName}] demonstrou interesse em adotar o animal [${animal.animalName}] sob os cuidados da nossa organização.
           
-          Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário [${request.tutor.tutorName}] o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.
+          Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário [${request.adopter.adopterName}] o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.
           
           Lembramos que a segurança e o bem-estar do animal são nossa prioridade. Certifique-se de seguir nossos procedimentos padrão de adoção e garantir que o novo lar seja adequado para o animal.
           
@@ -98,9 +101,9 @@ async function notificatorSendRequestUser(request, ngoId) {
         <body>
             <p>Prezados Membros da Equipe da ONG <strong>[${ngo.ngoName}]</strong>,</p>
       
-            <p>Gostaríamos de informar que uma nova solicitação de adoção foi recebida em nossa plataforma. O usuário <strong>[${request.tutor.tutorName}]</strong> demonstrou interesse em adotar o animal <strong>[${animal.animalName}]</strong> sob os cuidados da nossa organização.</p>
+            <p>Gostaríamos de informar que uma nova solicitação de adoção foi recebida em nossa plataforma. O usuário <strong>[${request.adopter.adopterName}]</strong> demonstrou interesse em adotar o animal <strong>[${animal.animalName}]</strong> sob os cuidados da nossa organização.</p>
       
-            <p>Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário <strong>[${request.tutor.tutorName}]</strong> o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.</p>
+            <p>Agradecemos por seu incrível trabalho em cuidar dos animais e fornecer a eles um ambiente seguro e amoroso. Por favor, entre em contato com o usuário <strong>[${request.adopter.adopterName}]</strong> o mais rápido possível para discutir os detalhes da adoção e agendar uma visita, se necessário.</p>
       
             <p>Lembramos que a segurança e o bem-estar do animal são nossa prioridade. Certifique-se de seguir nossos procedimentos padrão de adoção e garantir que o novo lar seja adequado para o animal.</p>
       
@@ -127,6 +130,6 @@ async function notificatorSendRequestUser(request, ngoId) {
   }
 
   module.exports = {
-    notificatorSendRequestUser,
+    notificatorSendRequestAdopter,
     notificatorSendRequestNgo
   }

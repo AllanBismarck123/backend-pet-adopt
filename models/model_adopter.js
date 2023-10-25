@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-class ModelTutor {
+class ModelAdopter {
     constructor(
-        urlImageTutor,
-        tutorName, 
+        urlImageAdopter,
+        adopterName, 
         cpf, 
         rg, 
         age, 
@@ -15,8 +15,8 @@ class ModelTutor {
         telephone, 
         email
     ) {
-        this.urlImageTutor = urlImageTutor;
-        this.tutorName = tutorName;
+        this.urlImageAdopter = urlImageAdopter;
+        this.adopterName = adopterName;
         this.cpf = cpf;
         this.rg = rg;
         this.age = age;
@@ -30,9 +30,9 @@ class ModelTutor {
     }
 }
 
-const modelTutorObj = mongoose.Schema({
-    urlImageTutor: String,
-    tutorName: String,
+const modelAdopterObj = mongoose.Schema({
+    urlImageAdopter: String,
+    adopterName: String,
     cpf: String,
     rg: String,
     age: String,
@@ -45,9 +45,9 @@ const modelTutorObj = mongoose.Schema({
     email: String
 });
 
-const ModelTutorClass = mongoose.model('ModelTutor', modelTutorObj);
+const ModelAdopterClass = mongoose.model('ModelAdopter', modelAdopterObj);
 
 module.exports = {
-    ModelTutorClass,
-    modelTutorObj
+    ModelAdopterClass,
+    modelAdopterObj
 };

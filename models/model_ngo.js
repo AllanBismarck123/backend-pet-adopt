@@ -3,7 +3,7 @@ const { modelAnimalObj } = require('./model_animal');
 const { modelAdoptObj } = require('./model_adopt');
 const { modelRequestAdoptObj } = require('./model_request_adopt');
 
-const modelUserObj = mongoose.Schema({
+const modelNgoObj = mongoose.Schema({
     ngoName: String,
     email: String,
     animals: [modelAnimalObj],
@@ -11,7 +11,7 @@ const modelUserObj = mongoose.Schema({
     requestsAdopts: [modelRequestAdoptObj]
 });
 
-class ModelUser {
+class ModelNgo {
     constructor(ngoName, email, animals, adopts, requestsAdopts) {
         this.ngoName = ngoName;
         this.email = email;
@@ -21,8 +21,8 @@ class ModelUser {
     }
 }
 
-const ModelUserClass = mongoose.model('ModelUser', modelUserObj);
+const ModelNgoClass = mongoose.model('ModelNgo', modelNgoObj);
 
 module.exports = {
-    ModelUserClass
+    ModelNgoClass
 }
