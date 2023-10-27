@@ -1,4 +1,4 @@
-const { sendEmails } = require('./notificator_config_email');
+const { sendEmails, afterEmail, afterEmailHtml } = require('./notificator_config_email');
 
 const { readNgoById } = require('../db_manager/db_client_ngo_mongo');
 const { readAnimalById } = require('../db_manager/db_client_animals');
@@ -21,10 +21,7 @@ async function notificatorSendRequestAdopter(request, ngoId) {
           
           Obrigado por escolher a adoção e por fazer a diferença na vida de um animal.
           
-          Atenciosamente,
-          [Notificador de e-mails]
-          [Assistente de adoção]
-          [${ngo.ngoName}]
+          ${afterEmail(ngo.ngoName)}
         `;
       
         var html = `
@@ -46,17 +43,13 @@ async function notificatorSendRequestAdopter(request, ngoId) {
         
             <p>Obrigado por escolher a adoção e por fazer a diferença na vida de um animal.</p>
         
-            <p>Atenciosamente,<br>
-                <em>Notificador de E-mails</em><br>
-                <em>Assistente de Adoção</em><br>
-                <strong>[${ngo.ngoName}]</strong>
-            </p>
+            ${afterEmailHtml(ngo.ngoName)}
         </body>
         
         </html>  
         `;
       
-        await sendEmails(ngo.ngoName, subject, text, html, request.adopter.email);
+        await sendEmails(ngo.ngoName, subject, text, html, request.adopter.email, false);
     } catch (error) {
         console.error('Erro ao notificar sobre a solicitação de adoção ao tutor:', error);
         throw error;
@@ -84,10 +77,7 @@ async function notificatorSendRequestAdopter(request, ngoId) {
           
           Obrigado por tudo o que você faz para ajudar nossos animais necessitados.
           
-          Atenciosamente,
-          [Notificador de e-mails]
-          [Assistente de adoção]
-          [${ngo.ngoName}]
+          ${afterEmail(ngo.ngoName)}
         `;
       
         var html = `
@@ -111,17 +101,13 @@ async function notificatorSendRequestAdopter(request, ngoId) {
       
             <p>Obrigado por tudo o que você faz para ajudar nossos animais necessitados.</p>
       
-            <p>Atenciosamente,<br>
-                <em>Notificador de E-mails</em><br>
-                <em>Assistente de Adoção</em><br>
-                <strong>[${ngo.ngoName}]</strong>
-            </p>
+            ${afterEmailHtml(ngo.ngoName)}
         </body>
       
         </html>
         `;
       
-        await sendEmails(ngo.ngoName, subject, text, html, ngo.email);
+        await sendEmails(ngo.ngoName, subject, text, html, ngo.email, false);
     } catch (error) {
         console.error('Erro ao notificar sobre a solicitação de adoção do tutor à ONG:', error);
         throw error;

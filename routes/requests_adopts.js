@@ -19,8 +19,8 @@ const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 const { readAnimalById } = require('../db_manager/db_client_animals');
 
 const adopter = {
-    urlImageTutor: "",
-    tutorName: "Nome do tutor 2",
+    urlImageAdopter: "",
+    adopterName: "Nome do tutor 2",
     cpf: "Cpf do tutor2",
     rg: "RG do tutor",
     age: "idade do tutor",

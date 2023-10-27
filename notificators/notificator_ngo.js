@@ -1,4 +1,4 @@
-const { sendEmails } = require('./notificator_config_email');
+const { sendEmails, afterEmail, afterEmailHtml } = require('./notificator_config_email');
 
 async function notificatorWelcomeNgo(ngoName, ngoEmail) {
     try {
@@ -15,10 +15,7 @@ async function notificatorWelcomeNgo(ngoName, ngoEmail) {
             
             Obrigado por ser parte da nossa missão de salvar vidas de animais.
             
-            Atenciosamente,
-            [Notificador de E-mails]
-            [Assistente de Adoção]
-            ${ngoName}
+            ${afterEmail(ngoName)}
         `;
     
         var html = `
@@ -46,17 +43,13 @@ async function notificatorWelcomeNgo(ngoName, ngoEmail) {
                 Se você tiver alguma dúvida ou precisar de assistência para começar, nossa equipe está aqui para ajudar. Sinta-se à vontade para entrar em contato a qualquer momento.
             </p>
       
-            <p>Atenciosamente,<br>
-                <em>Notificador de E-mails</em><br>
-                <em>Assistente de Adoção</em><br>
-                ${ngoName}
-            </p>
+            ${afterEmailHtml(ngoName)}
         </body>
       
         </html>
         `;
     
-        await sendEmails(ngoName, subject, text, html, ngoEmail);
+        await sendEmails(ngoName, subject, text, html, ngoEmail, true);
     } catch (error) {
         console.error('Erro ao notificar sobre a criação de usuário:', error);
         throw error;
@@ -76,10 +69,7 @@ async function notificatorEditNgo(ngoName, ngoEmail) {
             
             Obrigado por ser parte da nossa missão de salvar vidas de animais.
             
-            Atenciosamente,
-            [Notificador de E-mails]
-            [Assistente de Adoção]
-            ${ngoName}
+            ${afterEmail(ngoName)}
         `;
     
         var html = `
@@ -103,17 +93,13 @@ async function notificatorEditNgo(ngoName, ngoEmail) {
                 Se você tiver alguma dúvida ou precisar de assistência para começar, nossa equipe está aqui para ajudar. Sinta-se à vontade para entrar em contato a qualquer momento.
             </p>
       
-            <p>Atenciosamente,<br>
-                <em>Notificador de E-mails</em><br>
-                <em>Assistente de Adoção</em><br>
-                ${ngoName}
-            </p>
+            ${afterEmailHtml(ngoName)}
         </body>
       
         </html>
         `;
     
-        await sendEmails(ngoName, subject, text, html, ngoEmail);
+        await sendEmails(ngoName, subject, text, html, ngoEmail, true);
     } catch (error) {
         console.error('Erro ao notificar sobre a edição da conta da ONG:', error);
         throw error;
@@ -134,10 +120,7 @@ async function notificatorDeleteNgo(ngoName, ngoEmail) {
 
             Se você tiver alguma dúvida ou precisar de assistência relacionada a essa ação, não hesite em entrar em contato conosco.
 
-            Atenciosamente,
-            Notificador de E-mails
-            Assistente de Adoção
-            ${ngoName}
+            ${afterEmail(ngoName)}
         `;
 
         const html = `
@@ -165,17 +148,13 @@ async function notificatorDeleteNgo(ngoName, ngoEmail) {
                     Se você tiver alguma dúvida ou precisar de assistência relacionada a essa ação, não hesite em entrar em contato conosco.
                 </p>
 
-                <p>Atenciosamente,<br>
-                    <em>Notificador de E-mails</em><br>
-                    <em>Assistente de Adoção</em><br>
-                    ${ngoName}
-                </p>
+                ${afterEmailHtml(ngoName)}
             </body>
 
             </html>
         `;
 
-        await sendEmails(ngoName, subject, text, html, ngoEmail);
+        await sendEmails(ngoName, subject, text, html, ngoEmail, true);
 
     } catch (error) {
         console.error('Erro ao notificar sobre a exclusão da conta da ONG:', error);

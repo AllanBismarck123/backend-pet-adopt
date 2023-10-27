@@ -16,10 +16,13 @@ const transporter = nodemailer.createTransport({
     connectionTimeout: 20000,
 });
 
-async function sendEmails(ngoName, subject, text, html, destinationEmail) {
+async function sendEmails(ngoName, subject, text, html, destinationEmail, accountMsg) {
+  const from =  accountMsg == true ? `Plataforma de adoção de animais <${process.env.EMAIL_USER}}>` :
+  `${ngoName} via Plataforma de adoção de animais" <${process.env.EMAIL_USER}}>`;
+  
   try {
     const info = await transporter.sendMail({
-      from: `${ngoName} via Disparador de e-mails" <${process.env.EMAIL_USER}}>`,
+      from: from,
       to: `${destinationEmail}, allanbismarck95@gmail.com1`,
       subject: subject,
       text: text,
@@ -39,6 +42,23 @@ async function sendEmails(ngoName, subject, text, html, destinationEmail) {
   //
 }
 
+function afterEmail(ngoName) {
+  return `Atenciosamente,
+  [Notificador de E - mails]
+  [Assistente de Adoção]
+  [${ngoName}]`;
+}
+
+function afterEmailHtml(ngoName) {
+  return `<p>Atenciosamente,<br>
+      <em>Notificador de E-mails</em><br>
+      <em>Assistente de Adoção</em><br>
+      <strong>[${ngoName}]</strong>
+  </p>`
+}
+
 module.exports = {
-    sendEmails
+    sendEmails,
+    afterEmail,
+    afterEmailHtml
 };

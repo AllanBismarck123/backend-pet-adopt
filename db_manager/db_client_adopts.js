@@ -5,8 +5,15 @@ const { readNgoById } = require('./db_client_ngo_mongo');
 const { 
     notificatorAcceptAdoptAdopter, 
     notificatorAcceptAdoptNgo, 
-    notificatorRejectAdopt 
+    notificatorRejectAdopt, 
+    notificatorUndoAdopt
 } = require('../notificators/notificator_adopt');
+
+const {
+    createAcceptanceByMistake,
+    createDevolution,
+    createMistreatment
+} = require('../notificators/subjects_reasons');
 
 async function acceptAdopt(ngoId, requestId) {
     try {
@@ -65,18 +72,33 @@ async function acceptAdopt(ngoId, requestId) {
     }
 }
 
-async function undoAdopt(adoptId, ngoId) {
+async function undoAdopt(adoptId, ngoId, subjectNumber) {
     try {
 
         var ngo = await readNgoById(ngoId);
 
         const adopt = ngo.adopts.filter(adopt => adopt._id.toString() === adoptId);
         const animal = adopt[0].animal;
-        console.log(animal);
 
         const updatedAdopts = ngo.adopts.filter(adopt => adopt._id.toString() !== adoptId);
 
         ngo.animals.push(animal);
+
+        var subjectReason;
+
+        switch(subjectNumber) {
+            case 1:
+                subjectReason = createAcceptanceByMistake(animal.animalName);
+                break;
+            case 2:
+                subjectReason = createDevolution(animal.animalName, ngo.ngoName);
+                break;
+            default: 
+                subjectReason = createMistreatment(animal.animalName);
+                break;
+        }
+
+        await notificatorUndoAdopt(ngo.ngoName, adopt[0], subjectReason);
 
         ngo.adopts = updatedAdopts;
 

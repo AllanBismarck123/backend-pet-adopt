@@ -11,7 +11,7 @@ const {
     notificatorWelcomeNgo, 
     notificatorEditNgo, 
     notificatorDeleteNgo 
-} = require('../notificators/notificator_ngo_adopter');
+} = require('../notificators/notificator_ngo');
 
 async function saveNgo(data) {
     const dataToInsert = new ModelNgoClass(data);
@@ -41,6 +41,9 @@ async function readNgo() {
 async function readNgoById(ngoId) {
     try {
         const ngo = await ModelNgoClass.findById(ngoId).exec();
+        if(!ngo) {
+            return null;
+        }
         return ngo;
     } catch (error) {
         console.error('Erro:', error);
@@ -51,15 +54,21 @@ async function readNgoById(ngoId) {
 async function updateNgoById(ngoId, newNgoName, newEmail) {
     try {
         var ngo = await readNgoById(ngoId);
-        ngo.ngoName = newNgoName == null ? ngo.ngoName : newNgoName;
-        ngo.email = newEmail == null ? ngo.email : newEmail;
+        if(ngo == null) {
+            return "ONG não encontrada";
+        } else {
+            ngo.ngoName = newNgoName == null ? ngo.ngoName : newNgoName;
+            ngo.email = newEmail == null ? ngo.email : newEmail;
 
-        await ngo.save();
-        await notificatorEditNgo(ngo.ngoName, ngo.email);
+            await ngo.save();
+            await notificatorEditNgo(ngo.ngoName, ngo.email);
 
-        console.log("Usuário atualizado com sucesso.")
+            console.log("ONG atualizada com sucesso.");
+            return "ONG atualizada com sucesso.";
+        }
     } catch(error) {
-        console.log("Erro ao atualizar o usuário", error);
+        console.log("Erro ao atualizar a ONG", error);
+        return "Erro ao atualizar a ONG";
     }
 }
 

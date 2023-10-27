@@ -29,14 +29,17 @@ router.post('/accept-adopt', async (req, res) => {
 router.post('/undo-adopt', async (req, res) => {
     var ngoId;
     var adoptId;
+    var subjectNumber;
 
     if(req.body) {
         ngoId = req.body.ngoId;
         adoptId = req.body.adoptId;
+        subjectNumber = req.body.subjectNumber;
     }
 
     try {
-        await undoAdopt(adoptId, ngoId);
+        await undoAdopt(adoptId, ngoId, subjectNumber);
+
         res.status(200).json({ message: 'Adoção desfeita com sucesso.' });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao desfazer adoção.' });

@@ -85,8 +85,17 @@ router.put('/update-ngo', async (req, res) => {
   }
 
   try {
-    await updateNgoById(ngoId, newNgoName, newEmail);
-    res.status(200).json({ message: 'Conta da ONG atualizada com sucesso.' });
+    const result = await updateNgoById(ngoId, newNgoName, newEmail);
+    switch(result) {
+      case 'ONG atualizada com sucesso.':
+        res.status(200).json({ message: result });
+        break;
+      case 'ONG não encontrada':
+        res.status(404).json({ message: result});
+        break;
+      default: 
+        res.status(500).json({ error: result});
+    }
   } catch (error) {
     res.status(500).json({ error: 'Erro ao atualizar a conta da ONG.' });
   }
