@@ -30,7 +30,7 @@ router.post('/create-animal', async (req, res) => {
 
     try {
         await saveAnimal(ngoId, animal);
-        res.status(200).json({ message: 'Animal cadastrado com sucesso.' });
+        res.status(201).json({ message: 'Animal cadastrado com sucesso.' });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao cadastrar animal.' });
     }
@@ -73,39 +73,24 @@ router.put('/update-animal', async (req, res) => {
     var ngoId;
     var newAnimal;
     var destAnimalId;
-    var urlImageAnimal;
-    var animalName;
-    var specie;
-    var race;
-    var age;
-    var specialCondition;
-    var sex;
 
     if (req.body) {
         ngoId = req.body.ngoId;
         destAnimalId = req.body.destAnimalId;
         newAnimal = req.body.newAnimal;
 
-        urlImageAnimal = newAnimal.urlImageAnimal;
-        animalName = newAnimal.animalName;
-        specie = newAnimal.specie;
-        race = newAnimal.race;
-        age = newAnimal.age;
-        specialCondition = newAnimal.specialCondition;
-        sex = newAnimal.sex;
-
         if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(destAnimalId)) {
             return res.status(400).json({ error: 'ID da ONG ou do animal inválido.' });
         }
 
         if (
-            urlImageAnimal == null 
-            && animalName == null 
-            && specie == null 
-            && race == null 
-            && age == null 
-            && specialCondition == null 
-            && sex == null
+            newAnimal.urlImageAnimal == null 
+            && newAnimal.animalName == null 
+            && newAnimal.specie == null 
+            && newAnimal.race == null 
+            && newAnimal.age == null 
+            && newAnimal.specialCondition == null 
+            && newAnimal.sex == null
         ) {
             return res.status(400).json({ error: 'Novos dados são obrigatórios.' });
         }
@@ -113,8 +98,8 @@ router.put('/update-animal', async (req, res) => {
     }
 
     try {
-        var result = await updateAnimalByNgo(ngoId, destAnimalId, newAnimal);
-        res.status(200).json({ message: result });
+        const result = await updateAnimalByNgo(ngoId, destAnimalId, newAnimal);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao atualizar o animal.' });
     }
@@ -135,8 +120,8 @@ router.delete('/delete-animal', async (req, res) => {
     }
 
     try {
-        var result = await deleteAnimalByNgo(ngoId, animalId);
-        res.json({ message: result });
+        const result = await deleteAnimalByNgo(ngoId, animalId);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao deletar animal.' });
     }

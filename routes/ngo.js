@@ -24,8 +24,8 @@ const ngo = {
 
 router.post('/create-ngo', async (req, res) => {
   try {
-    await saveNgo(ngo);
-    res.status(200).json({ message: 'Conta da ONG criada com sucesso.' });
+    const result = await saveNgo(ngo);
+    res.status(result.statusCode).json({ message: result.msg });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao criar conta da ONG.' });
   }
@@ -34,9 +34,9 @@ router.post('/create-ngo', async (req, res) => {
 router.get('/ngos', async (req, res) => {
   try {
     const data = await readNgo();
-    res.status(200).json(data);
+    res.status(data.statusCode).json(data.msg);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao ler dados.' });
+    res.status(500).json({ error: 'Erro ao buscar ONGs.' });
   }
 });
 
@@ -53,11 +53,9 @@ router.get('/ngo', async (req, res) => {
   }
 
   try {
-    const ngo = await readNgoById(ngoId);
-    if (!ngo) {
-      return res.status(404).json({ error: 'ONG não encontrada.' });
-    }
-    res.status(200).json(ngo);
+    const result = await readNgoById(ngoId);
+
+    res.status(result.statusCode).json(result.msg);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar ONG.' });
   }
@@ -86,16 +84,8 @@ router.put('/update-ngo', async (req, res) => {
 
   try {
     const result = await updateNgoById(ngoId, newNgoName, newEmail);
-    switch(result) {
-      case 'ONG atualizada com sucesso.':
-        res.status(200).json({ message: result });
-        break;
-      case 'ONG não encontrada':
-        res.status(404).json({ message: result});
-        break;
-      default: 
-        res.status(500).json({ error: result});
-    }
+    res.status(result.statusCode).json({ message: result.msg });
+
   } catch (error) {
     res.status(500).json({ error: 'Erro ao atualizar a conta da ONG.' });
   }
@@ -110,18 +100,20 @@ router.delete('/delete-ngo', async (req, res) => {
   }
 
   if (!mongoose.Types.ObjectId.isValid(ngoId)) {
-    return res.status(400).json({ error: 'ID de documento inválido.' });
+    return res.status(400).json({ error: 'ID da ONG inválido.' });
   }
 
   try {
-    var result = await deleteNgoById(ngoId);
-    if(result == false) {
-      res.status(404).json({ error: 'ONG não encontrada.' });
-    } else {
-      res.json({ message: 'Conta da ONG deletada com sucesso.' });
+    const result = await deleteNgoById(ngoId);
+
+    if(result == null) {
+      res.status(500).json({ error: 'Erro ao deletar conta da ONG.' });
+    } else {      
+        res.status(result.statusCode).json({ message: result.msg });
     }
+
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao deletar conta da ONG.' });
+      res.status(500).json({ error: 'Erro ao deletar conta da ONG.' });
   }
 });
 

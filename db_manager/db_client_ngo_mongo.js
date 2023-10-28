@@ -23,52 +23,69 @@ async function saveNgo(data) {
         await notificatorWelcomeNgo(dataToInsert.ngoName, dataToInsert.email);
 
         console.log('Documento inserido com sucesso:', result._id);
+        console.log(result);
+
+        if(result) {
+            return { statusCode: 201, msg: "ONG cadastrada com sucesso." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao cadastrar ONG." };
+        }
     } catch (error) {
-        console.error('Erro:', error);
+        console.error('Error:', error);
+        return { statusCode: 500, msg: "Erro ao cadastrar ONG." };
     }
 }
 
 async function readNgo() {
     try {
         const data = await ModelNgoClass.find().exec();
-        return data;
+
+        return { statusCode: 200, msg: data };
     } catch (error) {
         console.error('Erro:', error);
-        return [];
+        return { statusCode: 500, msg: "Erro ao buscar ONGs." };
     }
 }
 
 async function readNgoById(ngoId) {
     try {
         const ngo = await ModelNgoClass.findById(ngoId).exec();
+
         if(!ngo) {
-            return null;
+            return { statusCode: 404, msg: "ONG não encontrada."};
         }
-        return ngo;
+
+        return { statusCode: 200, msg: ngo };
     } catch (error) {
         console.error('Erro:', error);
-        return null;
+        return { statusCode: 500, msg: "Erro ao buscar ONG."};
     }
 }
 
 async function updateNgoById(ngoId, newNgoName, newEmail) {
     try {
         var ngo = await readNgoById(ngoId);
+
         if(ngo == null) {
-            return "ONG não encontrada";
+            return { statusCode: 404, msg: "ONG não encontrada."};
         } else {
             ngo.ngoName = newNgoName == null ? ngo.ngoName : newNgoName;
             ngo.email = newEmail == null ? ngo.email : newEmail;
 
-            await ngo.save();
+            const result = await ngo.save();
+
+            if(result == null) {
+                return { statusCode: 500, msg: "Erro ao atualizar ONG."};
+            }
+
             await notificatorEditNgo(ngo.ngoName, ngo.email);
 
             console.log("ONG atualizada com sucesso.");
-            return "ONG atualizada com sucesso.";
+            return { statusCode: 200, msg: "ONG atualizada com sucesso." };
         }
     } catch(error) {
         console.log("Erro ao atualizar a ONG", error);
-        return "Erro ao atualizar a ONG";
+        return { statusCode: 500, msg: "Erro ao atualizar ONG."};
     }
 }
 
@@ -78,24 +95,27 @@ async function deleteNgoById(ngoId) {
 
         var ngo = await readNgoById(ngoId);
 
+        if(ngo == null) {
+            return { statusCode: 404, msg: "ONG não encontrada."};
+        }
+
         const result = await ModelNgoClass.deleteOne(ngoObjId);
         if(!result) {
-            throw new Error('Documento não encontrado.');
+            return { statusCode: 500, msg: "Erro ao deletar ONG."};
         }
 
-        if(ngo) {
-            await notificatorDeleteNgo(ngo.ngoName, ngo.email);
-        }
+        await notificatorDeleteNgo(ngo.ngoName, ngo.email);
 
-        console.log("Documento deletado com sucesso:", result);
         if(result.deletedCount > 0) {
-            return true;
+            console.log("ONG deletada com sucesso:", result);
+            return { statusCode: 200, msg: "ONG deletada com sucesso."};
         } else {
-            return false;
+            console.error('Erro ao deletar o documento:', error);
+            return { statusCode: 500, msg: "Erro ao deletar ONG."};
         }   
     } catch (error) {
         console.error('Erro ao deletar o documento:', error);
-        return false;
+        return { statusCode: 500, msg: "Erro ao deletar ONG."};
     }
 }
 

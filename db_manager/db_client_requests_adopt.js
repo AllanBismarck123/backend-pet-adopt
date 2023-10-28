@@ -65,17 +65,17 @@ async function deleteRequestByAdopter(ngoId, requestId) {
                 await ngo.save();
 
                 console.log("Requisição deletada com sucesso.");
-                return "Requisição deletada com sucesso.";
+                return { statusCode: 200, msg: "Requisição deletada com sucesso."};
             } else {
                 console.log("Requisição não encontrado para deleção.");
-                return "Requisição não encontrado para deleção.";
+                return { statusCode: 404, msg: "Requisição não encontrado para deleção."};
             }
 
         }
         console.log("Documento deletado com sucesso:", result);
     } catch (error) {
         console.error('Erro ao deletar a requisição:', error);
-        return "Erro ao deletar requisição";
+        return { statusCode: 500, msg: "Erro ao deletar requisição" };
     }
 }
 

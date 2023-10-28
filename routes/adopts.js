@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-const mongoose = require('mongoose');
-
 const { acceptAdopt, rejectAll, undoAdopt } = require('../db_manager/db_client_adopts');
 
 router.post('/accept-adopt', async (req, res) => {
@@ -16,11 +14,8 @@ router.post('/accept-adopt', async (req, res) => {
 
     try {
         const result = await acceptAdopt(ngoId, requestId);
-        if(result) {
-            res.status(200).json({ message: 'Adoção aceita com sucesso.' });
-        } else {
-            res.status(404).json({ message: 'Requisição não encontrada.' });
-        }
+        
+        res.status(result.statusCode).json({ msg: result.msg});
     } catch (error) {
         res.status(500).json({ error: 'Erro ao aceitar adoção.' });
     }
@@ -38,9 +33,9 @@ router.post('/undo-adopt', async (req, res) => {
     }
 
     try {
-        await undoAdopt(adoptId, ngoId, subjectNumber);
+        const result = await undoAdopt(adoptId, ngoId, subjectNumber);
 
-        res.status(200).json({ message: 'Adoção desfeita com sucesso.' });
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao desfazer adoção.' });
     }
@@ -56,10 +51,10 @@ router.post('/reject-all-requests', async (req, res) => {
     }
 
     try {
-        await rejectAll(ngoId, animalId);
-        res.status(200).json({ message: 'Solicitações de adoção deletadas com sucesso.' });
+        const result = await rejectAll(ngoId, animalId);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao deletar adoções.' });
+        res.status(500).json({ error: 'Erro ao rejeitar adoções.' });
     }
 });
 

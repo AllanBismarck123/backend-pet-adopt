@@ -16,7 +16,6 @@ const {
 } = require('../notificators/notificator_request');
 
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
-const { readAnimalById } = require('../db_manager/db_client_animals');
 
 const adopter = {
     urlImageAdopter: "",
@@ -114,7 +113,7 @@ router.delete('/delete-request', async (req, res) => {
 
     try {
         var result = await deleteRequestByAdopter(ngoId, requestId);
-        res.json({ message: result });
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao deletar requisição.' });
     }
