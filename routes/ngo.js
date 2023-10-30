@@ -33,8 +33,8 @@ router.post('/create-ngo', async (req, res) => {
 
 router.get('/ngos', async (req, res) => {
   try {
-    const data = await readNgo();
-    res.status(data.statusCode).json(data.msg);
+    const result = await readNgo();
+    res.status(result.statusCode).json(result.msg);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar ONGs.' });
   }

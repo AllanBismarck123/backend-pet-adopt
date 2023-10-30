@@ -3,6 +3,8 @@ const router = express.Router();
 
 const { acceptAdopt, rejectAll, undoAdopt } = require('../db_manager/db_client_adopts');
 
+const mongoose = require('mongoose');
+
 router.post('/accept-adopt', async (req, res) => {
     var ngoId;
     var requestId;
@@ -10,6 +12,10 @@ router.post('/accept-adopt', async (req, res) => {
     if(req.body) {
         ngoId = req.body.ngoId;
         requestId = req.body.requestId;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(requestId)) {
+        return res.status(400).json({ error: 'ID da ONG ou da requisição inválido.' });
     }
 
     try {
@@ -32,6 +38,10 @@ router.post('/undo-adopt', async (req, res) => {
         subjectNumber = req.body.subjectNumber;
     }
 
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(adoptId)) {
+        return res.status(400).json({ error: 'ID da ONG ou da adoção inválido.' });
+    }
+
     try {
         const result = await undoAdopt(adoptId, ngoId, subjectNumber);
 
@@ -48,6 +58,10 @@ router.post('/reject-all-requests', async (req, res) => {
     if(req.body) {
         ngoId = req.body.ngoId;
         animalId = req.body.animalId;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
+        return res.status(400).json({ error: 'ID da ONG ou do animal inválido.' });
     }
 
     try {

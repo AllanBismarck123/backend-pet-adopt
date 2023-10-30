@@ -22,21 +22,21 @@ async function acceptAdopt(ngoId, requestId) {
 
         if(ngo == null) {
             console.log("ONG não encontrada.");
-            return { statusCode: 404, msg: "ONG não encontrada"};
+            return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
         const request = await readRequestById(ngoId, requestId);
 
         if(request == null) {
             console.log("Requisição não encontrada.");
-            return { statusCode: 404, msg: "Requisição não encontrada"};
+            return { statusCode: 404, msg: "Requisição não encontrada."};
         }
 
         const animal = await readAnimalById(ngoId, request.animalId);
 
         if(animal == null) {
             console.log("Animal não encontrado.");
-            return { statusCode: 404, msg: "Animal não encontrado"};
+            return { statusCode: 404, msg: "Animal não encontrado."};
         }
 
         const adopter = request.adopter;
@@ -100,14 +100,14 @@ async function undoAdopt(adoptId, ngoId, subjectNumber) {
 
         if(ngo == null) {
             console.log("ONG não encontrada.");
-            return { statusCode: 404, msg: "ONG não encontrada"};
+            return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
         const adopt = ngo.adopts.filter(adopt => adopt._id.toString() === adoptId);
 
         if(adopt == null) {
             console.log("Adoção não encontrada.");
-            return { statusCode: 404, msg: "Adoção não encontrada"};
+            return { statusCode: 404, msg: "Adoção não encontrada."};
         }
 
         const animal = adopt[0].animal;

@@ -44,6 +44,10 @@ router.post('/create-request', async (req, res) => {
         animalId = req.body.animalId;
     }
 
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
+        return res.status(400).json({ error: 'ID da ONG ou do animal inválido.' });
+    }
+
     try {
         var requests = await readRequestsAdopt(ngoId);
 
@@ -53,14 +57,16 @@ router.post('/create-request', async (req, res) => {
             return res.status(400).json({ message: 'Você já fez uma solicitação de adoção para esse animal, aguarde o andamento do processo de adoção.' });
         }
 
-        await saveRequestAdopt(adopter, animalId, ngoId);
+        const result = await saveRequestAdopt(adopter, animalId, ngoId);
 
         const request = new ModelRequestAdoptClass({ adopter: adopter, animalId: animalId });
         
-        await notificatorSendRequestAdopter(request, ngoId);
-        await notificatorSendRequestNgo(request, ngoId);
+        if(result.statusCode == 200) {
+            await notificatorSendRequestAdopter(request, ngoId);
+            await notificatorSendRequestNgo(request, ngoId);
+        }
 
-        res.status(200).json({ message: 'Requisição de adoção realizada com sucesso.' });
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao realizar requisição de adoção.' });
     }
@@ -73,9 +79,13 @@ router.get('/all-requests', async (req, res) => {
         ngoId = req.body.ngoId;
     }
 
+    if (!mongoose.Types.ObjectId.isValid(ngoId)) {
+        return res.status(400).json({ error: 'ID da ONG inválido.' });
+    }
+
     try {
-        const data = await readRequestsAdopt(ngoId);
-        res.status(200).json(data);
+        const result = await readRequestsAdopt(ngoId);
+        res.status(result.statusCode).json(result.msg);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler requisições de adoção.' });
     }
@@ -90,9 +100,13 @@ router.get('/read-request', async (req, res) => {
         requestId = req.body.requestId
     }
 
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(requestId)) {
+        return res.status(400).json({ error: 'ID da ONG ou da requisição inválido.' });
+    }
+
     try {
-        const data = await readRequestById(ngoId, requestId);
-        res.status(200).json(data);
+        const result = await readRequestById(ngoId, requestId);
+        res.status(result.statusCode).json(result.msg);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler requisição.' });
     }

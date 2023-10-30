@@ -28,9 +28,13 @@ router.post('/create-animal', async (req, res) => {
         ngoId = req.body.ngoId;
     }
 
+    if (!mongoose.Types.ObjectId.isValid(ngoId)) {
+        return res.status(400).json({ error: 'ID da ONG inválido.' });
+    }
+
     try {
-        await saveAnimal(ngoId, animal);
-        res.status(201).json({ message: 'Animal cadastrado com sucesso.' });
+        const result = await saveAnimal(ngoId, animal);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao cadastrar animal.' });
     }
@@ -43,9 +47,13 @@ router.get('/all-animals', async (req, res) => {
         ngoId = req.body.ngoId;
     }
 
+    if (!mongoose.Types.ObjectId.isValid(ngoId)) {
+        return res.status(400).json({ error: 'ID da ONG inválido.' });
+    }
+
     try {
-        const data = await readAnimals(ngoId);
-        res.status(200).json(data);
+        const result = await readAnimals(ngoId);
+        res.status(result.statusCode).json(result.msg);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animais.' });
     }
@@ -60,9 +68,13 @@ router.get('/read-animal', async (req, res) => {
         animalId = req.body.animalId
     }
 
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
+        return res.status(400).json({ error: 'ID da ONG ou do animal inválido.' });
+    }
+
     try {
-        const data = await readAnimalById(ngoId, animalId);
-        res.status(200).json(data);
+        const result = await readAnimalById(ngoId, animalId);
+        res.status(result.statusCode).json(result.msg);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animal.' });
     }
