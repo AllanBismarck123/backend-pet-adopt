@@ -52,7 +52,9 @@ router.post('/create-request', async (req, res) => {
         var requests = await readRequestsAdopt(ngoId);
 
         const existingRequest = requests.find((element) => element.adopter.cpf === adopter.cpf && element.animalId === animalId);
-
+        
+        console.log('entrei aqui');
+        
         if (existingRequest) {
             return res.status(400).json({ message: 'Você já fez uma solicitação de adoção para esse animal, aguarde o andamento do processo de adoção.' });
         }

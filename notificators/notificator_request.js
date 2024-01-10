@@ -6,7 +6,7 @@ const { readAnimalById } = require('../db_manager/db_client_animals');
 async function notificatorSendRequestAdopter(request, ngoId) {
     try {
         var animal = await readAnimalById(ngoId, request.animalId);
-        var ngo = await readNgoById(ngoId);
+        var ngo = await readNgoById(ngoId).msg;
       
         var subject = 'Solicitação de Adoção de Animal';
       
@@ -60,7 +60,7 @@ async function notificatorSendRequestAdopter(request, ngoId) {
   async function notificatorSendRequestNgo(request, ngoId) {
     try {
         var animal = await readAnimalById(ngoId, request.animalId);
-        var ngo = await readNgoById(ngoId);
+        var ngo = await readNgoById(ngoId).msg;
       
         var subject = 'Nova Solicitação de Adoção';
       

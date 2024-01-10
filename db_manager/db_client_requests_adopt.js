@@ -8,9 +8,11 @@ const {
 async function saveRequestAdopt(adopter, animalId, ngoId) {
     try {
         const dataToInsert = new ModelRequestAdoptClass({ adopter: adopter, animalId: animalId });
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
@@ -33,9 +35,11 @@ async function saveRequestAdopt(adopter, animalId, ngoId) {
 
 async function readRequestsAdopt(ngoId) {
     try {
-        const ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        const ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
@@ -50,9 +54,11 @@ async function readRequestsAdopt(ngoId) {
 async function readRequestById(ngoId, requestId) {
     try {
 
-        const ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        const ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
@@ -78,9 +84,11 @@ async function readRequestById(ngoId, requestId) {
 async function deleteRequestByAdopter(ngoId, requestId) {
 
     try {
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
@@ -106,7 +114,6 @@ async function deleteRequestByAdopter(ngoId, requestId) {
                 console.log("Requisição não encontrado para deleção.");
                 return { statusCode: 404, msg: "Requisição não encontrada para deleção."};
             }
-
         }
 
         console.log("Documento deletado com sucesso:", result);

@@ -18,9 +18,11 @@ const {
 async function acceptAdopt(ngoId, requestId) {
     try {
 
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
@@ -96,9 +98,11 @@ async function acceptAdopt(ngoId, requestId) {
 async function undoAdopt(adoptId, ngoId, subjectNumber) {
     try {
 
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
@@ -152,9 +156,19 @@ async function undoAdopt(adoptId, ngoId, subjectNumber) {
 async function rejectAll(ngoId, animalId) {
     try {
 
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
+
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
+            return { statusCode: 404, msg: "ONG não encontrada."};
+        }
 
         const updatedRequests = ngo.requestsAdopts.filter(request => request.animalId !== animalId);
+
+        const removedRequests = ngo.requestsAdopts.filter(request => request.animalId === animalId);
+
+        console.log(removedRequests);
 
         ngo.requestsAdopts = updatedRequests;
 

@@ -4,9 +4,11 @@ const { readNgoById } = require('./db_client_ngo_mongo');
 async function saveAnimal(ngoId, data) {
     try {
         const dataToInsert = new ModelAnimalClass(data);
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -28,9 +30,11 @@ async function saveAnimal(ngoId, data) {
 
 async function readAnimals(ngoId) {
     try {
-        const ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        const ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             return { statusCode: 404, msg: [] };
         }
 
@@ -45,9 +49,11 @@ async function readAnimalById(ngoId, animalId) {
 
     try {
 
-        const ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        const ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -71,9 +77,11 @@ async function readAnimalById(ngoId, animalId) {
 
 async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
     try {
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -123,9 +131,11 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
 async function deleteAnimalByNgo(ngoId, animalId) {
 
     try {
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada." };
         }

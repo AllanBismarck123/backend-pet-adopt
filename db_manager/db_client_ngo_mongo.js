@@ -64,9 +64,11 @@ async function readNgoById(ngoId) {
 
 async function updateNgoById(ngoId, newNgoName, newEmail) {
     try {
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada."};
         } else {
             ngo.ngoName = newNgoName == null ? ngo.ngoName : newNgoName;
@@ -93,9 +95,11 @@ async function deleteNgoById(ngoId) {
     try {
         var ngoObjId = new ObjectId(ngoId);
 
-        var ngo = await readNgoById(ngoId);
+        const resultNgo = await readNgoById(ngoId);
 
-        if(ngo == null) {
+        var ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
