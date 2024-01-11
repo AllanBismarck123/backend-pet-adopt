@@ -18,7 +18,7 @@ const {
 async function acceptAdopt(ngoId, requestId) {
     try {
 
-        const resultNgo = await readNgoById(ngoId);
+        var resultNgo = await readNgoById(ngoId);
 
         var ngo = resultNgo.msg;
 
@@ -27,14 +27,21 @@ async function acceptAdopt(ngoId, requestId) {
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
-        const request = await readRequestById(ngoId, requestId);
+        var request = await readRequestById(ngoId, requestId);
 
-        if(request == null) {
+        request = request.msg;
+
+        console.log('request');
+        console.log(request);
+
+        if(request == "Requisição não encontrada.") {
             console.log("Requisição não encontrada.");
             return { statusCode: 404, msg: "Requisição não encontrada."};
         }
 
-        const animal = await readAnimalById(ngoId, request.animalId);
+        var animal = await readAnimalById(ngoId, request.animalId);
+
+        animal = animal.msg;
 
         if(animal == null) {
             console.log("Animal não encontrado.");
@@ -48,7 +55,10 @@ async function acceptAdopt(ngoId, requestId) {
         await ngo.adopts.push(dataToInsert);
         await ngo.save();
 
-        ngo = await readNgoById(ngoId);
+        resultNgo = await readNgoById(ngoId);
+
+        ngo = resultNgo.msg;
+
         var length = ngo.requestsAdopts.length;
 
         if(length > 0) {
@@ -167,6 +177,10 @@ async function rejectAll(ngoId, animalId) {
         const updatedRequests = ngo.requestsAdopts.filter(request => request.animalId !== animalId);
 
         const removedRequests = ngo.requestsAdopts.filter(request => request.animalId === animalId);
+
+        removedRequests.forEach(async (element) => {
+            await notificatorRejectAdopt(ngoId, element);
+        });
 
         console.log(removedRequests);
 

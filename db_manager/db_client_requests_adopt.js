@@ -22,14 +22,14 @@ async function saveRequestAdopt(adopter, animalId, ngoId) {
         const result = await ngo.save();
 
         if(result == null) {
-            return { statusCode: 500, msg: "Erro ao aceitar adoção." };
+            return { statusCode: 500, msg: "Erro ao criar requisição de adoção." };
         }
 
         console.log('Documento inserido com sucesso:', result._id);
         return { statusCode: 200, msg: "Requisição criada com sucesso." };
     } catch (error) {
         console.error('Erro:', error);
-        return { statusCode: 500, msg: "Erro ao aceitar adoção." };
+        return { statusCode: 500, msg: "Erro ao criar requisição de adoção." };
     }
 }
 

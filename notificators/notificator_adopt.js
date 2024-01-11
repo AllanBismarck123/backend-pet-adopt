@@ -5,7 +5,9 @@ const { readAnimalById } = require('../db_manager/db_client_animals');
 
 async function notificatorAcceptAdoptAdopter(ngoId, adopt) {
     try {
-        var ngo = await readNgoById(ngoId).msg;
+        const resultNgo = await readNgoById(ngoId);
+
+        const ngo = resultNgo.msg;
 
         var subject = 'Sua Solicitação de Adoção foi Aceita!';
 
@@ -73,7 +75,9 @@ async function notificatorAcceptAdoptAdopter(ngoId, adopt) {
 
 async function notificatorAcceptAdoptNgo(ngoId, adopt) {
     try {
-        var ngo = await readNgoById(ngoId).msg;
+        const resultNgo = await readNgoById(ngoId);
+
+        const ngo = resultNgo.msg;
 
         var subject = 'Confirmação de Aceitação de Solicitação de Adoção';
 
@@ -144,7 +148,9 @@ async function notificatorAcceptAdoptNgo(ngoId, adopt) {
 async function notificatorRejectAdopt(ngoId, request) {
     try {
         var animal = await readAnimalById(ngoId, request.animalId);
-        var ngo = await readNgoById(ngoId).msg;
+        const resultNgo = await readNgoById(ngoId);
+
+        const ngo = resultNgo.msg;
 
         var subject = 'Recusa da Solicitação de Adoção para [Nome do Animal]';
 

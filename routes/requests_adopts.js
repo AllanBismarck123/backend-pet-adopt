@@ -19,8 +19,8 @@ const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 
 const adopter = {
     urlImageAdopter: "",
-    adopterName: "Nome do tutor 2",
-    cpf: "Cpf do tutor2",
+    adopterName: "Nome do tutor 1",
+    cpf: "Cpf do tutor1",
     rg: "RG do tutor",
     age: "idade do tutor",
     road: "rua do endereço",
@@ -51,9 +51,11 @@ router.post('/create-request', async (req, res) => {
     try {
         var requests = await readRequestsAdopt(ngoId);
 
+        requests = requests.msg;
+
+        console.log(requests);
+
         const existingRequest = requests.find((element) => element.adopter.cpf === adopter.cpf && element.animalId === animalId);
-        
-        console.log('entrei aqui');
         
         if (existingRequest) {
             return res.status(400).json({ message: 'Você já fez uma solicitação de adoção para esse animal, aguarde o andamento do processo de adoção.' });
