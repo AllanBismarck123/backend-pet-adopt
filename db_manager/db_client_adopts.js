@@ -31,9 +31,6 @@ async function acceptAdopt(ngoId, requestId) {
 
         request = request.msg;
 
-        console.log('request');
-        console.log(request);
-
         if(request == "Requisição não encontrada.") {
             console.log("Requisição não encontrada.");
             return { statusCode: 404, msg: "Requisição não encontrada."};
@@ -181,8 +178,6 @@ async function rejectAll(ngoId, animalId) {
         removedRequests.forEach(async (element) => {
             await notificatorRejectAdopt(ngoId, element);
         });
-
-        console.log(removedRequests);
 
         ngo.requestsAdopts = updatedRequests;
 

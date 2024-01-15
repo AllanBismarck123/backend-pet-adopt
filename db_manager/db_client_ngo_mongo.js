@@ -16,14 +16,10 @@ const {
 async function saveNgo(data) {
     const dataToInsert = new ModelNgoClass(data);
     try {
-        ModelNgoClass.createCollection().then((collection) => {
-            console.log("Collection is created!");
-        });
+        await ModelNgoClass.createCollection();
+        
         const result = await dataToInsert.save();
         await notificatorWelcomeNgo(dataToInsert.ngoName, dataToInsert.email);
-
-        console.log('Documento inserido com sucesso:', result._id);
-        console.log(result);
 
         if(result) {
             return { statusCode: 201, msg: "ONG cadastrada com sucesso." };
