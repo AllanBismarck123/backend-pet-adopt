@@ -139,4 +139,30 @@ router.delete('/delete-animal', async (req, res) => {
     }
 });
 
+router.get('/read-animal-by-filter', async (req, res) => {
+    var ngoId;
+    var animalRace;
+    var animalAge;
+    var animalSpecialCondition;
+    var animalName;
+    var animalSpecie;
+    var animalSex;
+
+    if (req.body) {
+        ngoId = req.body.ngoId;
+        animalId = req.body.animalId;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ngoId)) {
+        return res.status(400).json({ error: 'ID da ONG inválido.' });
+    }
+
+    try {
+        const result = await readAnimalById(ngoId, animalId);
+        res.status(result.statusCode).json(result.msg);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao ler animal.' });
+    }
+});
+
 module.exports = router;

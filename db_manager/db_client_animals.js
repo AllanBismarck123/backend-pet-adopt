@@ -171,10 +171,56 @@ async function deleteAnimalByNgo(ngoId, animalId) {
     }
 }
 
+async function readAnimalByRace(ngoId, animalRace) {
+    try {
+
+        const resultNgo = await readNgoById(ngoId);
+
+        const ngo = resultNgo.msg;
+
+        if(resultNgo == null) {
+            return { statusCode: 404, msg: "ONG não encontrada." };
+        }
+
+        if (ngo != null && animalRace != null) {
+            var animals = ngo.animals;
+            const animalsByRace = animals.filter(animal => animal.race.toString() === animalRace);
+
+            return { statusCode: 200, msg: animalsByRace };
+        }
+
+        return { statusCode: 500, msg: "Erro ao buscar animais pela raça." };
+    } catch (error) {
+        console.error('Erro:', error);
+        return { statusCode: 500, msg: "Erro ao buscar animais pela raça." };
+    }
+}
+
+async function readAnimalByAge() {
+
+}
+
+async function readAnimalByName() {
+
+}
+
+async function readAnimalBySex() {
+
+}
+
+async function readAnimalBySpecialCondition() {
+
+}
+
+async function readAnimalBySpecie() {
+
+}
+
 module.exports = {
     saveAnimal,
     readAnimals,
     readAnimalById,
     updateAnimalByNgo,
-    deleteAnimalByNgo
+    deleteAnimalByNgo,
+    readAnimalByRace
 };
