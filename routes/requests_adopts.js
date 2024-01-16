@@ -53,8 +53,6 @@ router.post('/create-request', async (req, res) => {
 
         requests = requests.msg;
 
-        console.log(requests);
-
         const existingRequest = requests.find((element) => element.adopter.cpf === adopter.cpf && element.animalId === animalId);
         
         if (existingRequest) {

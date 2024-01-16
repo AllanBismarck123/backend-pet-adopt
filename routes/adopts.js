@@ -58,9 +58,6 @@ router.post('/reject-all-requests', async (req, res) => {
     if(req.body) {
         ngoId = req.body.ngoId;
         animalId = req.body.animalId;
-
-        console.log(ngoId);
-        console.log(animalId);
     }
 
     if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
