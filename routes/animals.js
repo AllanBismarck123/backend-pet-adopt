@@ -3,12 +3,13 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
-const { 
-    saveAnimal, 
-    readAnimals, 
-    readAnimalById, 
-    updateAnimalByNgo, 
-    deleteAnimalByNgo
+const {
+    saveAnimal,
+    readAnimals,
+    readAnimalById,
+    updateAnimalByNgo,
+    deleteAnimalByNgo,
+    readAnimalByFilters
 } = require('../db_manager/db_client_animals');
 
 const animal = {
@@ -23,8 +24,8 @@ const animal = {
 
 router.post('/create-animal', async (req, res) => {
     var ngoId;
-    
-    if(req.body) {
+
+    if (req.body) {
         ngoId = req.body.ngoId;
     }
 
@@ -96,12 +97,12 @@ router.put('/update-animal', async (req, res) => {
         }
 
         if (
-            newAnimal.urlImageAnimal == null 
-            && newAnimal.animalName == null 
-            && newAnimal.specie == null 
-            && newAnimal.race == null 
-            && newAnimal.age == null 
-            && newAnimal.specialCondition == null 
+            newAnimal.urlImageAnimal == null
+            && newAnimal.animalName == null
+            && newAnimal.specie == null
+            && newAnimal.race == null
+            && newAnimal.age == null
+            && newAnimal.specialCondition == null
             && newAnimal.sex == null
         ) {
             return res.status(400).json({ error: 'Novos dados são obrigatórios.' });
@@ -122,7 +123,7 @@ router.delete('/delete-animal', async (req, res) => {
     var ngoId;
     var animalId;
 
-    if(req.body) {
+    if (req.body) {
         ngoId = req.body.ngoId;
         animalId = req.body.animalId;
     }
@@ -141,27 +142,35 @@ router.delete('/delete-animal', async (req, res) => {
 
 router.get('/read-animal-by-filter', async (req, res) => {
     var ngoId;
-    var animalRace;
-    var animalAge;
-    var animalSpecialCondition;
-    var animalName;
-    var animalSpecie;
-    var animalSex;
+    var animalParameters;
+    var animalTypeFilters;
 
     if (req.body) {
         ngoId = req.body.ngoId;
-        animalId = req.body.animalId;
+        animalParameters = req.body.animalParameters;
+        animalTypeFilters = req.body.animalTypeFilters;
     }
 
     if (!mongoose.Types.ObjectId.isValid(ngoId)) {
         return res.status(400).json({ error: 'ID da ONG inválido.' });
     }
 
+    if (
+        animalTypeFilters.length == 0 || 
+        animalParameters.length == 0 || 
+        animalTypeFilters == null || 
+        animalParameters == null || 
+        animalTypeFilters.length != animalParameters.length
+    ) {
+        return res.status(400).json({ error: 'Parâmetros de filtro inválidos.' });
+    }
+
     try {
-        const result = await readAnimalById(ngoId, animalId);
+        var result = await readAnimalByFilters(ngoId, animalParameters, animalTypeFilters);
+
         res.status(result.statusCode).json(result.msg);
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao ler animal.' });
+        res.status(500).json({ error: 'Erro ao ler animais por filtros.' });
     }
 });
 

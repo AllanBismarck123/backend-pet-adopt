@@ -8,7 +8,7 @@ async function saveAnimal(ngoId, data) {
 
         var ngo = resultNgo.msg;
 
-        if(resultNgo == null) {
+        if (resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -16,7 +16,7 @@ async function saveAnimal(ngoId, data) {
 
         const result = await ngo.save();
 
-        if(result == null) {
+        if (result == null) {
             return { statusCode: 500, msg: "Erro ao cadastrar animal." };
         }
 
@@ -34,7 +34,7 @@ async function readAnimals(ngoId) {
 
         const ngo = resultNgo.msg;
 
-        if(resultNgo == null) {
+        if (resultNgo == null) {
             return { statusCode: 404, msg: [] };
         }
 
@@ -53,7 +53,7 @@ async function readAnimalById(ngoId, animalId) {
 
         const ngo = resultNgo.msg;
 
-        if(resultNgo == null) {
+        if (resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -61,7 +61,7 @@ async function readAnimalById(ngoId, animalId) {
             var animals = ngo.animals;
             const index = animals.findIndex((animal) => animal._id.toString() === animalId.toString());
 
-            if(index == null) {
+            if (index == null) {
                 return { statusCode: 404, msg: "Animal não encontrado." };
             }
 
@@ -81,7 +81,7 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
 
         var ngo = resultNgo.msg;
 
-        if(resultNgo == null) {
+        if (resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -107,7 +107,7 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
                 ngo.animals = animals;
                 const result = await ngo.save();
 
-                if(result) {
+                if (result) {
                     console.log("Animal atualizado com sucesso.");
                     return { statusCode: 200, msg: "Animal atualizado com sucesso." };
                 } else {
@@ -135,7 +135,7 @@ async function deleteAnimalByNgo(ngoId, animalId) {
 
         var ngo = resultNgo.msg;
 
-        if(resultNgo == null) {
+        if (resultNgo == null) {
             console.log("ONG não encontrada.");
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
@@ -149,7 +149,7 @@ async function deleteAnimalByNgo(ngoId, animalId) {
                 ngo.animals.splice(index, 1);
                 const result = await ngo.save();
 
-                if(result) {
+                if (result) {
                     console.log("Animal deletado com sucesso.");
                     return { statusCode: 200, msg: "Animal deletado com sucesso." };
                 } else {
@@ -171,49 +171,59 @@ async function deleteAnimalByNgo(ngoId, animalId) {
     }
 }
 
-async function readAnimalByRace(ngoId, animalRace) {
+async function readAnimalByFilters(ngoId, animalParameters, animalTypeFilters) {
     try {
 
         const resultNgo = await readNgoById(ngoId);
 
         const ngo = resultNgo.msg;
 
-        if(resultNgo == null) {
+        var animals = ngo.animals;
+
+        if (resultNgo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
-        if (ngo != null && animalRace != null) {
-            var animals = ngo.animals;
-            const animalsByRace = animals.filter(animal => animal.race.toString() === animalRace);
+        animalTypeFilters.forEach((element, index) => {
+            switch (element) {
+                case 'Age':
+                    animals = animals.filter(animal => animal.age == animalParameters[index]);
+                    // animals = animalsByFilters;
+                    break;
+                case 'Sex':
+                    animals = animals.filter(animal => animal.sex.toString()
+                    .toLowerCase() === animalParameters[index].toLowerCase());
+                    // animals = animalsByFilters;
+                    break;
+                case 'SpecialCondition':
+                    animals = animals.filter(animal => animal.specialCondition.length > 0);
+                    // animals = animalsByFilters;
+                    break;
+                case 'Specie':
+                    animals = animals.filter(animal => animal.specie.toString()
+                    .toLowerCase()
+                    .includes(animalParameters[index].toLowerCase()));
+                    // animals = animalsByFilters;
+                    break;
+                case 'Name':
+                    animals = animals.filter(animal => animal.animalName.toString()
+                    .toLowerCase()
+                    .includes(animalParameters[index].toLowerCase()));
+                    // animals = animalsByFilters;
+                    break;
+                default:
+                    animals = animals.filter(animal => animal.race.toString()
+                    .toLowerCase()
+                    .includes(animalParameters[index].toLowerCase()));
+                // animals = animalsByFilters;
+            }
+        });
 
-            return { statusCode: 200, msg: animalsByRace };
-        }
-
-        return { statusCode: 500, msg: "Erro ao buscar animais pela raça." };
+        return { statusCode: 200, msg: animals };
     } catch (error) {
         console.error('Erro:', error);
-        return { statusCode: 500, msg: "Erro ao buscar animais pela raça." };
+        return { statusCode: 500, msg: "Erro ao buscar animais pelos filtros." };
     }
-}
-
-async function readAnimalByAge() {
-
-}
-
-async function readAnimalByName() {
-
-}
-
-async function readAnimalBySex() {
-
-}
-
-async function readAnimalBySpecialCondition() {
-
-}
-
-async function readAnimalBySpecie() {
-
 }
 
 module.exports = {
@@ -222,5 +232,5 @@ module.exports = {
     readAnimalById,
     updateAnimalByNgo,
     deleteAnimalByNgo,
-    readAnimalByRace
+    readAnimalByFilters
 };
