@@ -18,8 +18,11 @@ const {
 const ngo = {
   ngoName: "ONG",
   email: "allan_b95@outlook.com",
+  password: "123456",
   animals: [],
-  adopts: []
+  adopts: [],
+  requestAdopts: [],
+  tokens: []
 }
 
 router.post('/create-ngo', async (req, res) => {

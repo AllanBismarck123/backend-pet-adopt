@@ -3,6 +3,8 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
+const { readNgoById } = require('../db_manager/db_client_ngo_mongo');
+
 const {
     saveRequestAdopt,
     readRequestsAdopt,
@@ -64,8 +66,22 @@ router.post('/create-request', async (req, res) => {
         const request = new ModelRequestAdoptClass({ adopter: adopter, animalId: animalId });
         
         if(result.statusCode == 200) {
-            await notificatorSendRequestAdopter(request, ngoId);
-            await notificatorSendRequestNgo(request, ngoId);
+            var ngo = await readNgoById(ngoId);
+            var animal = ngo.animals.id(request.animalId);
+
+            await notificatorSendRequestAdopter(
+                ngo.ngoName,
+                request.adopter.adopterName,
+                request.adopter.email, 
+                animal.animalId
+            );
+
+            await notificatorSendRequestNgo(
+                ngo.ngoName,
+                ngo.email,
+                request.adopter.adopterName, 
+                animal.animalId
+            );
         }
 
         res.status(result.statusCode).json({ message: result.msg });

@@ -1,5 +1,5 @@
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
-const { readNgoById } = require('./db_client_ngo_mongo');
+const { ModelNgoClass } = require('../models/model_ngo');
 
 const { 
     notificatorRejectAdopt  
@@ -8,12 +8,9 @@ const {
 async function saveRequestAdopt(adopter, animalId, ngoId) {
     try {
         const dataToInsert = new ModelRequestAdoptClass({ adopter: adopter, animalId: animalId });
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if(resultNgo == null) {
-            console.log("ONG não encontrada.");
+        if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
@@ -25,28 +22,22 @@ async function saveRequestAdopt(adopter, animalId, ngoId) {
             return { statusCode: 500, msg: "Erro ao criar requisição de adoção." };
         }
 
-        console.log('Documento inserido com sucesso:', result._id);
         return { statusCode: 200, msg: "Requisição criada com sucesso." };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao criar requisição de adoção." };
     }
 }
 
 async function readRequestsAdopt(ngoId) {
     try {
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        const ngo = resultNgo.msg;
-
-        if(resultNgo == null) {
-            console.log("ONG não encontrada.");
+        if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
         return { statusCode: 200, msg: ngo.requestsAdopts };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao buscar requisições de adoção." };
     }
 }
@@ -54,16 +45,13 @@ async function readRequestsAdopt(ngoId) {
 async function readRequestById(ngoId, requestId) {
     try {
 
-        const resultNgo = await readNgoById(ngoId);
+        const ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        const ngo = resultNgo.msg;
-
-        if(resultNgo == null) {
-            console.log("ONG não encontrada.");
+        if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
-        if (ngo != null && requestId != null) {
+        if (requestId != null) {
             var requestsAdopts = ngo.requestsAdopts;
             const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
 
@@ -76,7 +64,6 @@ async function readRequestById(ngoId, requestId) {
 
         return { statusCode: 500, msg: "Erro ao buscar requisição." }; 
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao buscar requisição." }; 
     }
 }
@@ -84,16 +71,13 @@ async function readRequestById(ngoId, requestId) {
 async function deleteRequestByAdopter(ngoId, requestId) {
 
     try {
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if(resultNgo == null) {
-            console.log("ONG não encontrada.");
+        if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
-        if (ngo != null && requestId != null) {
+        if (requestId != null) {
             var requestsAdopts = ngo.requestsAdopts;
 
             const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
@@ -105,21 +89,24 @@ async function deleteRequestByAdopter(ngoId, requestId) {
                 if(result == null) {
                     return { statusCode: 500, msg: "Erro ao deletar requisição." };
                 }
-                
-                await notificatorRejectAdopt(ngoId, ngo.requestsAdopts[index]);
 
-                console.log("Requisição deletada com sucesso.");
+                var animal = ngo.animals.id(requestsAdopts[index].animalId);
+                
+                await notificatorRejectAdopt(
+                    ngo.ngoName, 
+                    requestsAdopts[index].adopter.adopterName,
+                    requestsAdopts[index].adopter.email,
+                    animal.animalName
+                );
+
                 return { statusCode: 200, msg: "Requisição deletada com sucesso."};
             } else {
-                console.log("Requisição não encontrado para deleção.");
                 return { statusCode: 404, msg: "Requisição não encontrada para deleção."};
             }
         }
 
-        console.log("Documento deletado com sucesso:", result);
         return { statusCode: 500, msg: "Erro ao deletar requisição." };
     } catch (error) {
-        console.error('Erro ao deletar a requisição:', error);
         return { statusCode: 500, msg: "Erro ao deletar requisição." };
     }
 }

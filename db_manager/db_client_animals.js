@@ -1,14 +1,12 @@
 const { ModelAnimalClass } = require('../models/model_animal');
-const { readNgoById } = require('./db_client_ngo_mongo');
+const { ModelNgoClass } = require('../models/model_ngo');
 
 async function saveAnimal(ngoId, data) {
     try {
         const dataToInsert = new ModelAnimalClass(data);
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if (resultNgo == null) {
+        if (ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -20,28 +18,23 @@ async function saveAnimal(ngoId, data) {
             return { statusCode: 500, msg: "Erro ao cadastrar animal." };
         }
 
-        console.log('Documento inserido com sucesso:', result._id);
         return { statusCode: 201, msg: "Animal cadastrado com sucesso." };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao cadastrar animal." };
     }
 }
 
 async function readAnimals(ngoId) {
     try {
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        const ngo = resultNgo.msg;
-
-        if (resultNgo == null) {
-            return { statusCode: 404, msg: [] };
+        if (ngo == null) {
+            return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
         return { statusCode: 200, msg: ngo.animals };
     } catch (error) {
-        console.error('Erro:', error);
-        return { statusCode: 500, msg: [] };
+        return { statusCode: 500, msg: "Erro ao ler animais." };
     }
 }
 
@@ -49,39 +42,31 @@ async function readAnimalById(ngoId, animalId) {
 
     try {
 
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        const ngo = resultNgo.msg;
-
-        if (resultNgo == null) {
+        if (ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
-        if (ngo != null && animalId != null) {
-            var animals = ngo.animals;
-            const index = animals.findIndex((animal) => animal._id.toString() === animalId.toString());
+        var animal = ngo.animals.id(animalId);
 
-            if (index == null) {
-                return { statusCode: 404, msg: "Animal não encontrado." };
-            }
+        console.log(animal);
 
-            return { statusCode: 200, msg: ngo.animals[index] };
+        if(animal == null) {
+            return { statusCode: 404, msg: "Animal não encontrado."}
         }
 
-        return { statusCode: 500, msg: "Erro ao buscar animal." };
+        return { statusCode: 200, msg: animal };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao buscar animal." };
     }
 }
 
 async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
     try {
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if (resultNgo == null) {
+        if (ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -108,14 +93,11 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
                 const result = await ngo.save();
 
                 if (result) {
-                    console.log("Animal atualizado com sucesso.");
                     return { statusCode: 200, msg: "Animal atualizado com sucesso." };
                 } else {
-                    console.log("Animal não encontrado para atualização.");
-                    return { statusCode: 404, msg: "Animal não encontrado para atualização." };
+                    return { statusCode: 500, msg: "Erro ao atualizar animal." };
                 }
             } else {
-                console.log("Animal não encontrado para atualização.");
                 return { statusCode: 404, msg: "Animal não encontrado para atualização." };
             }
 
@@ -123,7 +105,6 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
 
         return { statusCode: 500, msg: "Erro ao atualizar animal." };
     } catch (error) {
-        console.log("Erro ao atualizar animal", error);
         return { statusCode: 500, msg: "Erro ao atualizar animal." };
     }
 }
@@ -131,16 +112,13 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
 async function deleteAnimalByNgo(ngoId, animalId) {
 
     try {
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if (resultNgo == null) {
-            console.log("ONG não encontrada.");
+        if (ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
-        if (ngo != null && animalId != null) {
+        if (animalId != null) {
             var animals = ngo.animals;
 
             const index = animals.findIndex((animal) => animal._id.toString() === animalId.toString());
@@ -149,24 +127,19 @@ async function deleteAnimalByNgo(ngoId, animalId) {
                 ngo.animals.splice(index, 1);
                 const result = await ngo.save();
 
-                if (result) {
-                    console.log("Animal deletado com sucesso.");
+                if (result != null) {
                     return { statusCode: 200, msg: "Animal deletado com sucesso." };
                 } else {
-                    console.log("Erro ao deletar animal.");
                     return { statusCode: 500, msg: "Erro ao deletar animal." };
                 }
             } else {
-                console.log("Animal não encontrado para deleção.");
                 return { statusCode: 404, msg: "Animal não encontrado para deleção." };
             }
 
         }
 
-        console.log("Erro ao deletar animal.");
         return { statusCode: 500, msg: "Erro ao deletar animal." };
     } catch (error) {
-        console.error('Erro ao deletar o animal:', error);
         return { statusCode: 500, msg: "Erro ao deletar animal." };
     }
 }
@@ -174,13 +147,11 @@ async function deleteAnimalByNgo(ngoId, animalId) {
 async function readAnimalByFilters(ngoId, animalParameters, animalTypeFilters) {
     try {
 
-        const resultNgo = await readNgoById(ngoId);
-
-        const ngo = resultNgo.msg;
+        const ngo = await ModelNgoClass.findById(ngoId).exec();
 
         var animals = ngo.animals;
 
-        if (resultNgo == null) {
+        if (ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
@@ -188,34 +159,28 @@ async function readAnimalByFilters(ngoId, animalParameters, animalTypeFilters) {
             switch (element) {
                 case 'Age':
                     animals = animals.filter(animal => animal.age == animalParameters[index]);
-                    // animals = animalsByFilters;
                     break;
                 case 'Sex':
                     animals = animals.filter(animal => animal.sex.toString()
                     .toLowerCase() === animalParameters[index].toLowerCase());
-                    // animals = animalsByFilters;
                     break;
                 case 'SpecialCondition':
                     animals = animals.filter(animal => animal.specialCondition.length > 0);
-                    // animals = animalsByFilters;
                     break;
                 case 'Specie':
                     animals = animals.filter(animal => animal.specie.toString()
                     .toLowerCase()
                     .includes(animalParameters[index].toLowerCase()));
-                    // animals = animalsByFilters;
                     break;
                 case 'Name':
                     animals = animals.filter(animal => animal.animalName.toString()
                     .toLowerCase()
                     .includes(animalParameters[index].toLowerCase()));
-                    // animals = animalsByFilters;
                     break;
                 default:
                     animals = animals.filter(animal => animal.race.toString()
                     .toLowerCase()
                     .includes(animalParameters[index].toLowerCase()));
-                // animals = animalsByFilters;
             }
         });
 

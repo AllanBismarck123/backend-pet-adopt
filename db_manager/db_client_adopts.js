@@ -1,7 +1,7 @@
+const { ModelNgoClass } = require('../models/model_ngo');
 const { ModelAdoptClass } = require('../models/model_adopt');
-const { readAnimalById, deleteAnimalByNgo } = require('./db_client_animals');
-const { readRequestById } = require('./db_client_requests_adopt');
-const { readNgoById } = require('./db_client_ngo_mongo');
+const { deleteAnimalByNgo } = require('./db_client_animals');
+
 const { 
     notificatorAcceptAdoptAdopter, 
     notificatorAcceptAdoptNgo, 
@@ -18,30 +18,21 @@ const {
 async function acceptAdopt(ngoId, requestId) {
     try {
 
-        var resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if(resultNgo == null) {
-            console.log("ONG não encontrada.");
+        if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
-        var request = await readRequestById(ngoId, requestId);
+        var request = ngo.requestsAdopts.id(requestId);
 
-        request = request.msg;
-
-        if(request == "Requisição não encontrada.") {
-            console.log("Requisição não encontrada.");
+        if(request == null) {
             return { statusCode: 404, msg: "Requisição não encontrada."};
         }
 
-        var animal = await readAnimalById(ngoId, request.animalId);
-
-        animal = animal.msg;
+        var animal = ngo.animals.id(request.animalId);
 
         if(animal == null) {
-            console.log("Animal não encontrado.");
             return { statusCode: 404, msg: "Animal não encontrado."};
         }
 
@@ -52,9 +43,7 @@ async function acceptAdopt(ngoId, requestId) {
         await ngo.adopts.push(dataToInsert);
         await ngo.save();
 
-        resultNgo = await readNgoById(ngoId);
-
-        ngo = resultNgo.msg;
+        ngo = await ModelNgoClass.findById(ngoId).exec();
 
         var length = ngo.requestsAdopts.length;
 
@@ -68,7 +57,14 @@ async function acceptAdopt(ngoId, requestId) {
                     === request.animalId.toString()
                 ) {
                     if(adopter.cpf !== ngo.requestsAdopts[index].adopter.cpf) {
-                        await notificatorRejectAdopt(ngoId, ngo.requestsAdopts[index]);
+                        var animal = ngo.animals.id(ngo.requestsAdopts[index].animalId);
+
+                        await notificatorRejectAdopt(
+                            ngo.ngoName, 
+                            ngo.requestsAdopts[index].adopter.adopterName,
+                            ngo.requestsAdopts[index].adopter.email,
+                            animal.animalId
+                        );
                     }
                     ngo.requestsAdopts.splice(index, 1);
                     await ngo.save();
@@ -79,10 +75,10 @@ async function acceptAdopt(ngoId, requestId) {
             }
         }
 
-        const result = await deleteAnimalByNgo(ngoId, request.animalId);
+        var result = await deleteAnimalByNgo(ngoId, request.animalId);
 
         if(result == null) {
-            return { statusCode: 500, msg: "Erro ao mover animal para adoção." };
+            return { statusCode: 500, msg: "Erro ao mudar o animal de disponível para adotado." };
         }
 
         result = await ngo.save();
@@ -91,13 +87,22 @@ async function acceptAdopt(ngoId, requestId) {
             return { statusCode: 500, msg: "Erro ao aceitar adoção." };
         }
 
-        await notificatorAcceptAdoptAdopter(ngoId, dataToInsert);
-        await notificatorAcceptAdoptNgo(ngoId, dataToInsert);
+        await notificatorAcceptAdoptAdopter(
+            ngo.ngoName, 
+            dataToInsert.adopter.adopterName,
+            dataToInsert.adopter.email,
+            dataToInsert.animal.animalName
+        );
 
-        console.log('Documento inserido com sucesso:', result._id);
+        await notificatorAcceptAdoptNgo(
+            ngo.ngoName,
+            ngo.email, 
+            dataToInsert.animal.animalName,
+            dataToInsert.adopter.adopterName
+        );
+
         return { statusCode: 200, msg: "Adoção aceita com sucesso."};
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao aceitar adoção."};
     }
 }
@@ -105,19 +110,15 @@ async function acceptAdopt(ngoId, requestId) {
 async function undoAdopt(adoptId, ngoId, subjectNumber) {
     try {
 
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if(resultNgo == null) {
-            console.log("ONG não encontrada.");
+        if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
         const adopt = ngo.adopts.filter(adopt => adopt._id.toString() === adoptId);
 
         if(adopt == null) {
-            console.log("Adoção não encontrada.");
             return { statusCode: 404, msg: "Adoção não encontrada."};
         }
 
@@ -141,7 +142,13 @@ async function undoAdopt(adoptId, ngoId, subjectNumber) {
                 break;
         }
 
-        await notificatorUndoAdopt(ngo.ngoName, adopt[0], subjectReason);
+        await notificatorUndoAdopt(
+            ngo.ngoName, 
+            adopt[0].adopter.adopterName,
+            adopt[0].adopter.email,
+            adopt[0].animal.animalName,
+            subjectReason
+        );
 
         ngo.adopts = updatedAdopts;
 
@@ -151,11 +158,8 @@ async function undoAdopt(adoptId, ngoId, subjectNumber) {
             return { statusCode: 500, msg: "Erro ao rejeitar adoções." };
         }
 
-        console.log('Adoção desfeita com sucesso: ', result._id);
-
         return { statusCode: 200, msg: "Adoção desfeita com sucesso." };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao desfazer adoção." };
     }
 }
@@ -163,11 +167,9 @@ async function undoAdopt(adoptId, ngoId, subjectNumber) {
 async function rejectAll(ngoId, animalId) {
     try {
 
-        const resultNgo = await readNgoById(ngoId);
+        var ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var ngo = resultNgo.msg;
-
-        if(resultNgo == null) {
+        if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada."};
         }
 
@@ -176,7 +178,14 @@ async function rejectAll(ngoId, animalId) {
         const removedRequests = ngo.requestsAdopts.filter(request => request.animalId === animalId);
 
         removedRequests.forEach(async (element) => {
-            await notificatorRejectAdopt(ngoId, element);
+            var animal = ngo.animals.id(element.animalId);
+
+            await notificatorRejectAdopt(
+                ngo.ngoName, 
+                element.adopter.adopterName,
+                element.adopter.email,
+                animal.animalName
+            );
         });
 
         ngo.requestsAdopts = updatedRequests;
@@ -187,10 +196,8 @@ async function rejectAll(ngoId, animalId) {
             return { statusCode: 500, msg: "Erro ao rejeitar adoções." };
         }
 
-        console.log('Lista de adoções excluída com sucesso: ', result._id);
         return { statusCode: 200, msg: "Adoções rejeitadas com sucesso." };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao rejeitar adoções."};
     }
 }
