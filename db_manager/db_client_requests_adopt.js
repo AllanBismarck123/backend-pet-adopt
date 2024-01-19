@@ -24,6 +24,7 @@ async function saveRequestAdopt(adopter, animalId, ngoId) {
 
         return { statusCode: 200, msg: "Requisição criada com sucesso." };
     } catch (error) {
+        console.log(error);
         return { statusCode: 500, msg: "Erro ao criar requisição de adoção." };
     }
 }
@@ -79,23 +80,24 @@ async function deleteRequestByAdopter(ngoId, requestId) {
 
         if (requestId != null) {
             var requestsAdopts = ngo.requestsAdopts;
-
+            
             const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
 
             if (index >= 0 && index < requestsAdopts.length) {
+                var animal = await ngo.animals.id(requestsAdopts[index].animalId);
+                var request = requestsAdopts[index];
+
                 ngo.requestsAdopts.splice(index, 1);
                 const result = await ngo.save();
 
                 if(result == null) {
                     return { statusCode: 500, msg: "Erro ao deletar requisição." };
                 }
-
-                var animal = ngo.animals.id(requestsAdopts[index].animalId);
                 
                 await notificatorRejectAdopt(
                     ngo.ngoName, 
-                    requestsAdopts[index].adopter.adopterName,
-                    requestsAdopts[index].adopter.email,
+                    request.adopter.adopterName,
+                    request.adopter.email,
                     animal.animalName
                 );
 
@@ -107,6 +109,7 @@ async function deleteRequestByAdopter(ngoId, requestId) {
 
         return { statusCode: 500, msg: "Erro ao deletar requisição." };
     } catch (error) {
+        console.log(error);
         return { statusCode: 500, msg: "Erro ao deletar requisição." };
     }
 }
