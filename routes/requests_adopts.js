@@ -149,7 +149,6 @@ router.delete('/delete-request', async (req, res) => {
         var result = await deleteRequestByAdopter(ngoId, requestId);
         res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'Erro ao deletar requisição.' });
     }
 });
