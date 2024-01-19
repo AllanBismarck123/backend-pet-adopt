@@ -109,7 +109,6 @@ async function deleteRequestByAdopter(ngoId, requestId) {
 
         return { statusCode: 500, msg: "Erro ao deletar requisição." };
     } catch (error) {
-        console.log(error);
         return { statusCode: 500, msg: "Erro ao deletar requisição." };
     }
 }
