@@ -12,7 +12,8 @@ const {
   readNgo,
   readNgoById,
   updateNgoById,
-  deleteNgoById
+  deleteNgoById,
+  teste
 } = require('../db_manager/db_client_ngo_mongo');
 
 const ngo = {
@@ -64,11 +65,34 @@ router.get('/ngo', async (req, res) => {
   }
 });
 
+router.get('/read-ngo', async (req, res) => {
+
+  var ngoId;
+
+  if(req.body) {
+    ngoId = req.body.ngoId;
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(ngoId)) {
+    return res.status(400).json({ error: 'ID de usuário inválido.' });
+  }
+
+  try {
+    const result = await teste(ngoId);
+
+    res.status(result.statusCode).json(result.msg);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar ONG.' });
+  }
+});
+
 router.put('/update-ngo', async (req, res) => {
 
   var ngoId;
   var newNgoName;
   var newEmail;
+
+  var authToken;
 
   if (req.body) {
     ngoId = req.body.ngoId;
@@ -85,8 +109,12 @@ router.put('/update-ngo', async (req, res) => {
 
   }
 
+  if(req.header) {
+    authToken = req.header('Authorization');
+  }
+
   try {
-    const result = await updateNgoById(ngoId, newNgoName, newEmail);
+    const result = await updateNgoById(ngoId, newNgoName, newEmail, authToken);
     res.status(result.statusCode).json({ message: result.msg });
 
   } catch (error) {
@@ -97,9 +125,14 @@ router.put('/update-ngo', async (req, res) => {
 
 router.delete('/delete-ngo', async (req, res) => {
   var ngoId;
+  var authToken;
 
   if(req.body) {
     ngoId = req.body.ngoId;
+  }
+
+  if(req.header) {
+    authToken = req.header('Authorization');
   }
 
   if (!mongoose.Types.ObjectId.isValid(ngoId)) {
@@ -107,7 +140,7 @@ router.delete('/delete-ngo', async (req, res) => {
   }
 
   try {
-    const result = await deleteNgoById(ngoId);
+    const result = await deleteNgoById(ngoId,authToken);
 
     if(result == null) {
       res.status(500).json({ error: 'Erro ao deletar conta da ONG.' });

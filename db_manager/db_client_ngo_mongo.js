@@ -19,6 +19,13 @@ const {
 async function saveNgo(data) {
     const dataToInsert = new ModelNgoClass(data);
     try {
+
+        const existingNgo = await ModelNgoClass.findOne({ email: dataToInsert.email });
+
+        if (existingNgo) {
+            return { statusCode: 400, msg: "Já existe uma ONG cadastrada com este e-mail." };
+        }
+
         await ModelNgoClass.createCollection();
 
         dataToInsert.password = await bcrypt.hash(dataToInsert.password, 10);
@@ -70,8 +77,27 @@ async function readNgoById(ngoId, req) {
     }
 }
 
-async function updateNgoById(ngoId, newNgoName, newEmail) {
+async function teste(ngoId) {
     try {
+
+        const ngo = await ModelNgoClass.findById(ngoId).exec();
+
+        if(!ngo) {
+            return { statusCode: 404, msg: "ONG não encontrada." };
+        }
+
+        return { statusCode: 200, msg: ngo };
+    } catch (error) {
+        console.error('Erro:', error);
+        return { statusCode: 500, msg: "Erro ao buscar ONG." };
+    }
+}
+
+async function updateNgoById(ngoId, newNgoName, newEmail, authToken) {
+    try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
+
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
         if(ngo == null) {
@@ -91,12 +117,15 @@ async function updateNgoById(ngoId, newNgoName, newEmail) {
             return { statusCode: 200, msg: "ONG atualizada com sucesso." };
         }
     } catch(error) {
-        return { statusCode: 500, msg: "Erro ao atualizar ONG." };
+        return { statusCode: 401, msg: "Usuário não autenticado." };
     }
 }
 
-async function deleteNgoById(ngoId) {
+async function deleteNgoById(ngoId, authToken) {
     try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
+
         var ngoObjId = new ObjectId(ngoId);
 
         var ngo = await ModelNgoClass.findById(ngoId).exec();
@@ -119,7 +148,7 @@ async function deleteNgoById(ngoId) {
             return { statusCode: 500, msg: "Erro ao deletar ONG." };
         }   
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao deletar ONG." };
+        return { statusCode: 401, msg: "Usuário não autenticado." };
     }
 }
 
@@ -128,5 +157,6 @@ module.exports = {
     readNgo,
     readNgoById,
     updateNgoById,
-    deleteNgoById
+    deleteNgoById,
+    teste
 };
