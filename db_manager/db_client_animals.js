@@ -26,8 +26,11 @@ async function saveAnimal(ngoId, data, authToken) {
 
         return { statusCode: 201, msg: "Animal cadastrado com sucesso." };
     } catch (error) {
-        console.log(error);
-        return { statusCode: 401, msg: "Usuário não autenticado." };
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao cadastrar animal." };
+        }
     }
 }
 
@@ -113,7 +116,11 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal, authToken) {
 
         return { statusCode: 500, msg: "Erro ao atualizar animal." };
     } catch (error) {
-        return { statusCode: 401, msg: "Usuário não autenticado." };
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao atualizar animal." };
+        }
     }
 }
 
@@ -151,7 +158,11 @@ async function deleteAnimalByNgo(ngoId, animalId, authToken) {
 
         return { statusCode: 500, msg: "Erro ao deletar animal." };
     } catch (error) {
-        return { statusCode: 500, msg: "Usuário não autenticado." };
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao deletar animal." };
+        }
     }
 }
 

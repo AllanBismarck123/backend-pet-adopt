@@ -18,8 +18,10 @@ const {
     createMistreatment
 } = require('../notificators/subjects_reasons');
 
-async function acceptAdopt(ngoId, requestId) {
+async function acceptAdopt(ngoId, requestId, authToken) {
     try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
 
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
@@ -78,7 +80,7 @@ async function acceptAdopt(ngoId, requestId) {
             }
         }
 
-        var result = await deleteAnimalByNgo(ngoId, request.animalId);
+        var result = await deleteAnimalByNgo(ngoId, request.animalId, authToken);
 
         if(result == null) {
             return { statusCode: 500, msg: "Erro ao mudar o animal de disponível para adotado." };
@@ -106,12 +108,18 @@ async function acceptAdopt(ngoId, requestId) {
 
         return { statusCode: 200, msg: "Adoção aceita com sucesso."};
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao aceitar adoção."};
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao aceitar adoção." };
+        }
     }
 }
 
-async function undoAdopt(adoptId, ngoId, subjectNumber) {
+async function undoAdopt(adoptId, ngoId, subjectNumber, authToken) {
     try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
 
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
@@ -158,17 +166,23 @@ async function undoAdopt(adoptId, ngoId, subjectNumber) {
         const result = await ngo.save();
 
         if(result == null) {
-            return { statusCode: 500, msg: "Erro ao rejeitar adoções." };
+            return { statusCode: 500, msg: "Erro ao desfazer adoção." };
         }
 
         return { statusCode: 200, msg: "Adoção desfeita com sucesso." };
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao desfazer adoção." };
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao desfazer adoção." };
+        }
     }
 }
 
-async function rejectAll(ngoId, animalId) {
+async function rejectAll(ngoId, animalId, authToken) {
     try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
 
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
@@ -201,7 +215,11 @@ async function rejectAll(ngoId, animalId) {
 
         return { statusCode: 200, msg: "Adoções rejeitadas com sucesso." };
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao rejeitar adoções."};
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao rejeitar adoções." };
+        }
     }
 }
 

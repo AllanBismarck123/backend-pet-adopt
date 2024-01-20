@@ -21,8 +21,8 @@ const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 
 const adopter = {
     urlImageAdopter: "",
-    adopterName: "Nome do tutor 1",
-    cpf: "Cpf do tutor1",
+    adopterName: "Nome do tutor 2",
+    cpf: "Cpf do tutor2",
     rg: "RG do tutor",
     age: "idade do tutor",
     road: "rua do endereço",

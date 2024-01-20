@@ -56,7 +56,6 @@ async function readNgo() {
 
         return { statusCode: 200, msg: data };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao buscar ONGs." };
     }
 }
@@ -72,7 +71,6 @@ async function readNgoById(ngoId, req) {
 
         return { statusCode: 200, msg: ngo };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao buscar ONG." };
     }
 }
@@ -88,7 +86,6 @@ async function teste(ngoId) {
 
         return { statusCode: 200, msg: ngo };
     } catch (error) {
-        console.error('Erro:', error);
         return { statusCode: 500, msg: "Erro ao buscar ONG." };
     }
 }
@@ -117,7 +114,11 @@ async function updateNgoById(ngoId, newNgoName, newEmail, authToken) {
             return { statusCode: 200, msg: "ONG atualizada com sucesso." };
         }
     } catch(error) {
-        return { statusCode: 401, msg: "Usuário não autenticado." };
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao atualizar ONG." };
+        }
     }
 }
 
@@ -148,7 +149,11 @@ async function deleteNgoById(ngoId, authToken) {
             return { statusCode: 500, msg: "Erro ao deletar ONG." };
         }   
     } catch (error) {
-        return { statusCode: 401, msg: "Usuário não autenticado." };
+        if(error.name == 'JsonWebTokenError') {
+            return { statusCode: 401, msg: "Usuário não autenticado." };
+        } else {
+            return { statusCode: 500, msg: "Erro ao deletar ONG." };
+        }
     }
 }
 
