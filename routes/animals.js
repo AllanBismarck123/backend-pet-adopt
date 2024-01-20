@@ -24,9 +24,14 @@ const animal = {
 
 router.post('/create-animal', async (req, res) => {
     var ngoId;
+    var authToken;
 
     if (req.body) {
         ngoId = req.body.ngoId;
+    }
+
+    if(req.header) {
+        authToken = req.header('Authorization');
     }
 
     if (!mongoose.Types.ObjectId.isValid(ngoId)) {
@@ -34,7 +39,7 @@ router.post('/create-animal', async (req, res) => {
     }
 
     try {
-        const result = await saveAnimal(ngoId, animal);
+        const result = await saveAnimal(ngoId, animal, authToken);
         res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao cadastrar animal.' });
@@ -87,6 +92,8 @@ router.put('/update-animal', async (req, res) => {
     var newAnimal;
     var destAnimalId;
 
+    var authToken;
+
     if (req.body) {
         ngoId = req.body.ngoId;
         destAnimalId = req.body.destAnimalId;
@@ -110,8 +117,12 @@ router.put('/update-animal', async (req, res) => {
 
     }
 
+    if(req.header) {
+        authToken = req.header('Authorization');
+    }
+
     try {
-        const result = await updateAnimalByNgo(ngoId, destAnimalId, newAnimal);
+        const result = await updateAnimalByNgo(ngoId, destAnimalId, newAnimal, authToken);
         res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao atualizar o animal.' });
@@ -123,9 +134,15 @@ router.delete('/delete-animal', async (req, res) => {
     var ngoId;
     var animalId;
 
+    var authToken;
+
     if (req.body) {
         ngoId = req.body.ngoId;
         animalId = req.body.animalId;
+    }
+
+    if(req.header) {
+        authToken = req.header('Authorization');
     }
 
     if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
@@ -133,7 +150,7 @@ router.delete('/delete-animal', async (req, res) => {
     }
 
     try {
-        const result = await deleteAnimalByNgo(ngoId, animalId);
+        const result = await deleteAnimalByNgo(ngoId, animalId, authToken);
         res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao deletar animal.' });

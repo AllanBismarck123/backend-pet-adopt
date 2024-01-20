@@ -2,6 +2,9 @@ const { ModelNgoClass } = require('../models/model_ngo');
 const { ModelAdoptClass } = require('../models/model_adopt');
 const { deleteAnimalByNgo } = require('./db_client_animals');
 
+const jwt = require('jsonwebtoken');
+require('dotenv').config({ path: '.env.key' });
+
 const { 
     notificatorAcceptAdoptAdopter, 
     notificatorAcceptAdoptNgo, 

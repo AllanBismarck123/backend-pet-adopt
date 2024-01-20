@@ -1,8 +1,14 @@
 const { ModelAnimalClass } = require('../models/model_animal');
 const { ModelNgoClass } = require('../models/model_ngo');
 
-async function saveAnimal(ngoId, data) {
+const jwt = require('jsonwebtoken');
+require('dotenv').config({ path: '.env.key' });
+
+async function saveAnimal(ngoId, data, authToken) {
     try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
+
         const dataToInsert = new ModelAnimalClass(data);
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
@@ -20,7 +26,8 @@ async function saveAnimal(ngoId, data) {
 
         return { statusCode: 201, msg: "Animal cadastrado com sucesso." };
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao cadastrar animal." };
+        console.log(error);
+        return { statusCode: 401, msg: "Usuário não autenticado." };
     }
 }
 
@@ -50,8 +57,6 @@ async function readAnimalById(ngoId, animalId) {
 
         var animal = ngo.animals.id(animalId);
 
-        console.log(animal);
-
         if(animal == null) {
             return { statusCode: 404, msg: "Animal não encontrado."}
         }
@@ -62,8 +67,11 @@ async function readAnimalById(ngoId, animalId) {
     }
 }
 
-async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
+async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal, authToken) {
     try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
+
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
         if (ngo == null) {
@@ -105,13 +113,16 @@ async function updateAnimalByNgo(ngoId, destAnimalId, newAnimal) {
 
         return { statusCode: 500, msg: "Erro ao atualizar animal." };
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao atualizar animal." };
+        return { statusCode: 401, msg: "Usuário não autenticado." };
     }
 }
 
-async function deleteAnimalByNgo(ngoId, animalId) {
+async function deleteAnimalByNgo(ngoId, animalId, authToken) {
 
     try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
+
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
         if (ngo == null) {
@@ -140,7 +151,7 @@ async function deleteAnimalByNgo(ngoId, animalId) {
 
         return { statusCode: 500, msg: "Erro ao deletar animal." };
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao deletar animal." };
+        return { statusCode: 500, msg: "Usuário não autenticado." };
     }
 }
 

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const { ModelNgoClass } = require('../models/model_ngo');
 const { ObjectId } = require('mongodb');
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env.key' });
 
 mongoose.connect(process.env.MONGO_DB_URI,
