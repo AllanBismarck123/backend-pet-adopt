@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { login, logout } = require('../auth/login_logout');
+const { login, logout, resetPassword } = require('../auth/login_logout');
 
 router.post('/login', async (req, res) => {
 
@@ -46,6 +46,21 @@ router.post('/logout', async (req, res) => {
         console.error('Erro no logout:', error);
         return res.status(500).json({ error: 'Erro ao fazer logout.' });
     }
+});
+
+router.post('/reset-password/:token', async (req, res) => {
+    const { token } = req.params;
+    const { newPassword, oldPassword } = req.body;
+
+    console.log(token);
+  
+    const result = await resetPassword(token, newPassword, oldPassword);
+
+    if(result == null) {
+        return res.status(500).json({ message: 'Erro ao redefinir senha.'});
+    }
+    
+    return res.status(result.statusCode).json({ message: result.msg });
 });
 
 module.exports = router;
