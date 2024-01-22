@@ -46,17 +46,35 @@ async function logout(res, authToken) {
     }
 };
 
-async function resetPassword(token, newPassword) {
-  
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    const ngo = await ModelNgoClass.findOneAndUpdate({ resetToken: token }, { password: hashedPassword, resetToken: null });
-  
-    if (ngo) {
-      return { statusCode: 200, msg: 'Senha redefinida com sucesso.' };
-    } else {
-      return { statusCode: 400, error: 'Token inválido.' };
+async function resetPassword(token, newPassword, oldPassword) {
+
+    try {
+        if (oldPassword) {
+            const ngo = await ModelNgoClass.findOne({ 'tokens.token': token }).exec();
+            
+            if (!ngo) {
+                return { statusCode: 400, msg: 'Token inválido.' };
+            }
+    
+            const isOldPasswordValid = await bcrypt.compare(oldPassword, ngo.password);
+    
+            if (!isOldPasswordValid) {
+                return { statusCode: 401, msg: 'Senha antiga incorreta.' };
+            }
+        }
+      
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const ngo = await ModelNgoClass.findOneAndUpdate({ 'tokens.token': token }, { password: hashedPassword, resetToken: null }).exec();
+      
+        if (ngo) {
+          return { statusCode: 200, msg: 'Senha redefinida com sucesso.' };
+        } else {
+          return { statusCode: 400, msg: 'Token inválido.' };
+        }
+    } catch(error) {
+        return { statusCode: 500, msg: 'Erro ao redefinir senha.'};
     }
-  }
+}
 
 module.exports = {
     login,
