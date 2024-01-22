@@ -46,7 +46,20 @@ async function logout(res, authToken) {
     }
 };
 
+async function resetPassword(token, newPassword) {
+  
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const ngo = await ModelNgoClass.findOneAndUpdate({ resetToken: token }, { password: hashedPassword, resetToken: null });
+  
+    if (ngo) {
+      return { statusCode: 200, msg: 'Senha redefinida com sucesso.' };
+    } else {
+      return { statusCode: 400, error: 'Token inválido.' };
+    }
+  }
+
 module.exports = {
     login,
-    logout
+    logout,
+    resetPassword
 };
