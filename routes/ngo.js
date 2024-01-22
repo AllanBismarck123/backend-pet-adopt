@@ -4,6 +4,7 @@ const router = express.Router();
 const animals = require('./animals');
 const requests_adopts = require('./requests_adopts');
 const adopts = require('./adopts');
+const auth = require('./login_logout');
 
 const mongoose = require('mongoose');
 
@@ -156,5 +157,6 @@ router.delete('/delete-ngo', async (req, res) => {
 router.use('/animals', animals);
 router.use('/requests', requests_adopts);
 router.use('/adopts', adopts);
+router.use('/auth', auth);
 
 module.exports = router;

@@ -1,50 +1,50 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const router = express.Router();
-const UserModel = require('../models/userModel'); // Substitua pelo modelo real do seu usuário
+const { login, logout } = require('../auth/login_logout');
 
-// Rota para fazer login
 router.post('/login', async (req, res) => {
+
+    var email;
+    var password;
+
+    if(req.body) {
+        email = req.body.email;
+        password = req.body.password;
+    }
+
+
     try {
-        const { email, password } = req.body;
+        const result = await login(email, password);
 
-        // Verifique se o usuário existe no banco de dados
-        const user = await UserModel.findOne({ email });
-
-        if (!user) {
-            return res.status(401).json({ error: 'Credenciais inválidas.' });
+        if(result == null) {
+            return res.status(500).json({ message: 'Erro ao fazer login.'})
         }
 
-        // Verifique se a senha está correta
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        return res.status(result.statusCode).json({ message: result.msg });
 
-        if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Credenciais inválidas.' });
-        }
-
-        // Gere um token JWT
-        const token = jwt.sign({ userId: user._id }, 'suaChaveSecreta', { expiresIn: '1h' });
-
-        // Envie o token como resposta (você pode optar por usar cookies, local storage, etc.)
-        res.json({ token });
     } catch (error) {
-        console.error('Erro no login:', error);
-        res.status(500).json({ error: 'Erro no login.' });
+        return res.status(500).json({ error: 'Erro a fazer login.' });
     }
 });
 
-// Rota para fazer logout
 router.post('/logout', async (req, res) => {
-    try {
-        // Remova o token do cliente (por exemplo, limpando os cookies ou local storage)
-        // Aqui, estou usando cookies como exemplo
-        res.clearCookie('token');
+    var authToken;
 
-        res.status(200).json({ message: 'Logout bem-sucedido.' });
+    if(req.header) {
+        authToken = req.header('Authorization');
+    }
+
+    try {
+        const result = await logout(res, authToken);
+
+        if(result == null) {
+            return res.status(500).json({ message: 'Erro ao fazer logout.' });
+        }
+
+        return res.status(200).json({ message: 'Logout bem-sucedido.' });
     } catch (error) {
         console.error('Erro no logout:', error);
-        res.status(500).json({ error: 'Erro no logout.' });
+        return res.status(500).json({ error: 'Erro ao fazer logout.' });
     }
 });
 
