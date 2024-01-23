@@ -17,17 +17,20 @@ const {
   teste
 } = require('../db_manager/db_client_ngo_mongo');
 
-const ngo = {
-  ngoName: "ONG",
-  email: "allan_b95@outlook.com",
-  password: "123456",
-  animals: [],
-  adopts: [],
-  requestAdopts: [],
-  tokens: []
-}
-
 router.post('/create-ngo', async (req, res) => {
+  
+  const { ngoName, email, password } = req.body;
+
+  const ngo = {
+    ngoName: ngoName,
+    email: email,
+    password: password,
+    animals: [],
+    adopts: [],
+    requestAdopts: [],
+    tokens: []
+  }
+
   try {
     const result = await saveNgo(ngo);
     res.status(result.statusCode).json({ message: result.msg });

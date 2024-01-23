@@ -20,6 +20,14 @@ async function saveNgo(data) {
     const dataToInsert = new ModelNgoClass(data);
     try {
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        const isValidEmail = emailRegex.test(dataToInsert.email);
+
+        if(!isValidEmail) {
+            return { statusCode: 400, msg: "E-mail inválido." };
+        }
+
         const existingNgo = await ModelNgoClass.findOne({ email: dataToInsert.email });
 
         if (existingNgo) {

@@ -12,25 +12,31 @@ const {
     readAnimalByFilters
 } = require('../db_manager/db_client_animals');
 
-const animal = {
-    urlImageAnimal: "url da imagem",
-    animalName: "Nome",
-    specie: "animal",
-    race: "sem raça",
-    age: "2",
-    specialCondition: "muito bem de saúde",
-    sex: "male",
-}
-
 router.post('/create-animal', async (req, res) => {
-    var ngoId;
     var authToken;
 
-    if (req.body) {
-        ngoId = req.body.ngoId;
+    const { 
+        ngoId, 
+        urlImageAnimal, 
+        animalName, 
+        specie, 
+        race, 
+        age, 
+        specialCondition, 
+        sex 
+    } = req.body;
+
+    const animal = {
+        urlImageAnimal: urlImageAnimal,
+        animalName: animalName,
+        specie: specie,
+        race: race,
+        age: age,
+        specialCondition: specialCondition,
+        sex: sex
     }
 
-    if(req.header) {
+    if (req.header) {
         authToken = req.header('Authorization');
     }
 
@@ -117,7 +123,7 @@ router.put('/update-animal', async (req, res) => {
 
     }
 
-    if(req.header) {
+    if (req.header) {
         authToken = req.header('Authorization');
     }
 
@@ -141,7 +147,7 @@ router.delete('/delete-animal', async (req, res) => {
         animalId = req.body.animalId;
     }
 
-    if(req.header) {
+    if (req.header) {
         authToken = req.header('Authorization');
     }
 
@@ -173,10 +179,10 @@ router.get('/read-animal-by-filter', async (req, res) => {
     }
 
     if (
-        animalTypeFilters.length == 0 || 
-        animalParameters.length == 0 || 
-        animalTypeFilters == null || 
-        animalParameters == null || 
+        animalTypeFilters.length == 0 ||
+        animalParameters.length == 0 ||
+        animalTypeFilters == null ||
+        animalParameters == null ||
         animalTypeFilters.length != animalParameters.length
     ) {
         return res.status(400).json({ error: 'Parâmetros de filtro inválidos.' });

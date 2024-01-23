@@ -19,31 +19,38 @@ const {
 
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 
-const adopter = {
-    urlImageAdopter: "",
-    adopterName: "Nome do tutor 2",
-    cpf: "Cpf do tutor2",
-    rg: "RG do tutor",
-    age: "idade do tutor",
-    road: "rua do endereço",
-    numberHouse: "numero da casa",
-    neighborhood: "bairro",
-    city: "Cidade",
-    state: "Estado",
-    telephone: "telephone",
-    email: "allan_b95@outlook.com"
-}
-
 router.post('/create-request', async (req, res) => {
 
-    // var adopter;
-    var ngoId;
-    var animalId;
+    const {
+        ngoId,
+        animalId,
+        urlImageAdopter,
+        adopterName,
+        cpf,
+        rg,
+        age,
+        road,
+        numberHouse,
+        neighborhood,
+        city,
+        state,
+        telephone,
+        email
+    } = req.body;
 
-    if (req.body) {
-        // adopter = req.body.adopter;
-        ngoId = req.body.ngoId;
-        animalId = req.body.animalId;
+    const adopter = {
+        urlImageAdopter: urlImageAdopter,
+        adopterName: adopterName,
+        cpf: cpf,
+        rg: rg,
+        age: age,
+        road: road,
+        numberHouse: numberHouse,
+        neighborhood: neighborhood,
+        city: city,
+        state: state,
+        telephone: telephone,
+        email: email
     }
 
     if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
