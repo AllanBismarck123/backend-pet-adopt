@@ -23,7 +23,7 @@ async function sendEmails(ngoName, subject, text, html, destinationEmail, accoun
   try {
     const info = await transporter.sendMail({
       from: from,
-      to: `${destinationEmail}, allanbismarck95@gmail.com1`,
+      to: `${destinationEmail}`,
       subject: subject,
       text: text,
       html: html,
