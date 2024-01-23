@@ -127,9 +127,11 @@ router.put('/update-ngo', async (req, res) => {
 router.delete('/delete-ngo', async (req, res) => {
   var ngoId;
   var authToken;
+  var password;
 
   if(req.body) {
     ngoId = req.body.ngoId;
+    password = req.body.password;
   }
 
   if(req.header) {
@@ -141,7 +143,7 @@ router.delete('/delete-ngo', async (req, res) => {
   }
 
   try {
-    const result = await deleteNgoById(ngoId,authToken);
+    const result = await deleteNgoById(ngoId,authToken, password);
 
     if(result == null) {
       res.status(500).json({ error: 'Erro ao deletar conta da ONG.' });

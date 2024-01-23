@@ -122,7 +122,7 @@ async function updateNgoById(ngoId, newNgoName, newEmail, authToken) {
     }
 }
 
-async function deleteNgoById(ngoId, authToken) {
+async function deleteNgoById(ngoId, authToken, password) {
     try {
 
         const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
@@ -133,6 +133,12 @@ async function deleteNgoById(ngoId, authToken) {
 
         if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, ngo.password);
+
+        if (!isPasswordValid) {
+            return { statusCode: 401, msg: "Senha atual incorreta." };
         }
 
         const result = await ModelNgoClass.deleteOne(ngoObjId);

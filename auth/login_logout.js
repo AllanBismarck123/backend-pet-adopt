@@ -20,8 +20,6 @@ async function login(email, password) {
 
         const token = jwt.sign({ _id: ngo._id.toString() }, process.env.JWT_SECRET);
 
-        console.log('login', token);
-
         return { statusCode: 200, msg: token };
     } catch (error) {
         return { statusCode: 500, msg: 'Erro ao fazer login.' };
