@@ -69,27 +69,6 @@ router.get('/ngo', async (req, res) => {
   }
 });
 
-router.get('/read-ngo', async (req, res) => {
-
-  var ngoId;
-
-  if(req.body) {
-    ngoId = req.body.ngoId;
-  }
-
-  if (!mongoose.Types.ObjectId.isValid(ngoId)) {
-    return res.status(400).json({ error: 'ID de usuário inválido.' });
-  }
-
-  try {
-    const result = await teste(ngoId);
-
-    res.status(result.statusCode).json(result.msg);
-  } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar ONG.' });
-  }
-});
-
 router.put('/update-ngo', async (req, res) => {
 
   var ngoId;

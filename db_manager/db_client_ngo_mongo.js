@@ -83,21 +83,6 @@ async function readNgoById(ngoId, req) {
     }
 }
 
-async function teste(ngoId) {
-    try {
-
-        const ngo = await ModelNgoClass.findById(ngoId).exec();
-
-        if(!ngo) {
-            return { statusCode: 404, msg: "ONG não encontrada." };
-        }
-
-        return { statusCode: 200, msg: ngo };
-    } catch (error) {
-        return { statusCode: 500, msg: "Erro ao buscar ONG." };
-    }
-}
-
 async function updateNgoById(ngoId, newNgoName, newEmail, authToken) {
     try {
 
@@ -176,6 +161,5 @@ module.exports = {
     readNgo,
     readNgoById,
     updateNgoById,
-    deleteNgoById,
-    teste
+    deleteNgoById
 };

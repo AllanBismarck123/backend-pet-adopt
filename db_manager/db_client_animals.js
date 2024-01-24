@@ -171,11 +171,11 @@ async function readAnimalByFilters(ngoId, animalParameters, animalTypeFilters) {
 
         const ngo = await ModelNgoClass.findById(ngoId).exec();
 
-        var animals = ngo.animals;
-
         if (ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
+
+        var animals = ngo.animals;
 
         animalTypeFilters.forEach((element, index) => {
             switch (element) {

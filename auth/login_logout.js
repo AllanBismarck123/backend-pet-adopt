@@ -20,29 +20,34 @@ async function login(email, password) {
 
         const token = jwt.sign({ _id: ngo._id.toString() }, process.env.JWT_SECRET);
 
+        ngo.tokens = ngo.tokens.concat({ token });
+        await ngo.save();
+
         return { statusCode: 200, msg: token };
     } catch (error) {
         return { statusCode: 500, msg: 'Erro ao fazer login.' };
     }
 };
 
-async function logout(res, authToken) {
+async function logout(token) {
     try {
-
-        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
-
-        res.clearCookie('token');
-
-        return { statusCode: 200, msg: 'Logout bem-sucedido.' };
-    } catch (error) {
-        if(error.name == 'JsonWebTokenError') {
-            return { statusCode: 401, msg: 'Usuário não autenticado.' };
-        } else {
-            console.error('Erro no logout:', error);
-            return { statusCode: 500, msg: 'Erro no logout.' };
+        var ngo = await ModelNgoClass.findOne({ 'tokens.token': token }).exec();
+    
+        if(ngo == null) {
+            return { statusCode: 404, msg: 'ONG não encontrada.' };
         }
+
+        const index = ngo.tokens.findIndex((DestToken) => DestToken.toString() === token.toString());
+
+        ngo.tokens.splice(index, 1);
+        await ngo.save();
+
+        return { statusCode: 200, msg: "Logout realizado com sucesso."};
+    } catch (error) {
+        return { statusCode: 500, msg: "Erro ao fazer logout."};
     }
-};
+
+}
 
 async function resetPassword(token, newPassword, oldPassword) {
 
@@ -57,7 +62,7 @@ async function resetPassword(token, newPassword, oldPassword) {
             const isOldPasswordValid = await bcrypt.compare(oldPassword, ngo.password);
     
             if (!isOldPasswordValid) {
-                return { statusCode: 401, msg: 'Senha antiga incorreta.' };
+                return { statusCode: 401, msg: 'Senha atual incorreta.' };
             }
         }
       

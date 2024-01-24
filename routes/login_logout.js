@@ -28,31 +28,23 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', async (req, res) => {
-    var authToken;
+    var token;
 
     if(req.header) {
-        authToken = req.header('Authorization');
+        token = req.header('Authorization');
     }
 
-    try {
-        const result = await logout(res, authToken);
-
-        if(result == null) {
-            return res.status(500).json({ message: 'Erro ao fazer logout.' });
-        }
-
-        return res.status(200).json({ message: 'Logout bem-sucedido.' });
-    } catch (error) {
-        console.error('Erro no logout:', error);
-        return res.status(500).json({ error: 'Erro ao fazer logout.' });
+    if(token == null) {
+        return res.status(401).json({ message: "Usuário não autenticado."});
     }
+
+    const result = await logout(token);
+    return res.status(result.statusCode).json({ message: result.msg});
 });
 
 router.post('/reset-password/:token', async (req, res) => {
     const { token } = req.params;
     const { newPassword, oldPassword } = req.body;
-
-    console.log(token);
   
     const result = await resetPassword(token, newPassword, oldPassword);
 
@@ -73,7 +65,7 @@ router.post('/forgot-password', async (req, res) => {
   
       await notificatorForgotPassword(email, site);
   
-      res.status(200).json({ message: 'Se existir algum cadastro com o e-mail forncecido, foi enviado um e-mail para redefinição de senha. Por favor consulte o seu e-mail.' });
+      res.status(200).json({ message: 'Se existir algum cadastro com o e-mail fornecido, foi enviado um e-mail para redefinição de senha. Por favor consulte o seu e-mail.' });
     } catch (error) {
       console.error('Erro ao enviar notificação por e-mail:', error);
       res.status(500).json({ error: 'Erro ao enviar notificação por e-mail.' });
