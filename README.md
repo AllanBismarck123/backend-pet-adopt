@@ -1,3 +1,4 @@
+<a href="README_portuguese.md" target="_blank">Leia esta página em português</a>
 # Animal Adoption Platform 🐾
 
 Welcome to the Animal Adoption Platform, where we connect adorable animals with loving homes. This project aims to simplify and facilitate the adoption process, promoting responsibility and compassion towards animals.
