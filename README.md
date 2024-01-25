@@ -26,7 +26,13 @@ Explore our [Documentation](https://documenter.getpostman.com/view/32475615/2s9Y
 
 Track our progress and contribute to development through our [Trello Board](https://trello.com/b/fRxmXbu5/plataforma-de-ado%C3%A7%C3%A3o-de-animais). We use the Kanban methodology to organize tasks, implementations, and improvements. Be part of the process!
 
-# How to Contribute 🤝
+## Database Modeling 🗂️
+
+Explore the database model for the Animal Adoption Platform to understand how data is structured within the system. The model provides insights into the relationships between different entities, facilitating a comprehensive view of the platform's data organization.
+
+**[Database Model](https://github.com/allan-bismarck/backend-pet-adopt/blob/main/modelagem_banco_de_dados/Diagrama%20plataforma%20de%20ado%C3%A7%C3%A3o%20de%20animais%20(1).jpg)**
+
+## How to Contribute 🤝
 
 Thank you for considering contributing to the Animal Adoption Platform! Your help is crucial to making our platform even better. Follow the steps below to get started:
 
