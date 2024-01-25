@@ -1,3 +1,4 @@
+<a href="README.md" target="_blank">Read this page in English</a>
 # Plataforma de Adoção de Animais 🐾
 
 Bem-vindo(a) à Plataforma de Adoção de Animais, onde conectamos animais adoráveis a lares amorosos. Este projeto visa simplificar e facilitar o processo de adoção, promovendo a responsabilidade e compaixão para com os animais.
