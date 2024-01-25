@@ -1,6 +1,9 @@
 const { ModelRequestAdoptClass } = require('../models/model_request_adopt');
 const { ModelNgoClass } = require('../models/model_ngo');
 
+const jwt = require('jsonwebtoken');
+require('dotenv').config({ path: '.env.key' });
+
 const { 
     notificatorRejectAdopt  
 } = require('../notificators/notificator_adopt');
@@ -31,6 +34,7 @@ async function saveRequestAdopt(adopter, animalId, ngoId) {
 
 async function readRequestsAdopt(ngoId) {
     try {
+
         var ngo = await ModelNgoClass.findById(ngoId).exec();
 
         if(ngo == null) {
@@ -39,11 +43,42 @@ async function readRequestsAdopt(ngoId) {
 
         return { statusCode: 200, msg: ngo.requestsAdopts };
     } catch (error) {
-        return { statusCode: 500, msg: "Erro ao buscar requisições de adoção." };
+            return { statusCode: 500, msg: "Erro ao buscar requisições de adoção." };
     }
 }
 
-async function readRequestById(ngoId, requestId) {
+async function readRequestByAnimal(ngoId, animalId, authToken) {
+    try {
+
+        const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET);
+
+        const ngo = await ModelNgoClass.findById(ngoId).exec();
+
+        if(ngo == null) {
+            return { statusCode: 404, msg: "ONG não encontrada." };
+        }
+
+        if(ngo.requestsAdopts == null) {
+            return { statusCode: 404, msg: "Nenhuma requisição encontrada." };
+        }
+
+        var requests = ngo.requestsAdopts;
+
+        var requestsByAnimal = [];
+
+        requests.forEach((request) => {
+            if(request.animalId.toString() === animalId.toString()) {    
+                requestsByAnimal.push(request);
+            }
+        });
+
+        return { statusCode: 200, msg: requestsByAnimal };
+    } catch (error) {
+        return { statusCode: 500, msg: "Erro ao buscar requisição." }; 
+    }
+}
+
+async function readRequestByCPFAdopter(ngoId, cpfAdopter) {
     try {
 
         const ngo = await ModelNgoClass.findById(ngoId).exec();
@@ -52,9 +87,9 @@ async function readRequestById(ngoId, requestId) {
             return { statusCode: 404, msg: "ONG não encontrada." };
         }
 
-        if (requestId != null) {
+        if (cpfAdopter != null) {
             var requestsAdopts = ngo.requestsAdopts;
-            const index = requestsAdopts.findIndex((request) => request._id.toString() === requestId.toString());
+            const index = requestsAdopts.findIndex((request) => request.adopter.cpf.toString() === cpfAdopter.toString());
 
             if(index >= 0 && index < requestsAdopts.length) {
                 return { statusCode: 200, msg: ngo.requestsAdopts[index] };
@@ -116,6 +151,7 @@ async function deleteRequestByAdopter(ngoId, requestId) {
 module.exports = {
     saveRequestAdopt,
     readRequestsAdopt,
-    readRequestById,
+    readRequestByAnimal,
+    readRequestByCPFAdopter,
     deleteRequestByAdopter
 };

@@ -8,8 +8,9 @@ const { readNgoById } = require('../db_manager/db_client_ngo_mongo');
 const {
     saveRequestAdopt,
     readRequestsAdopt,
-    readRequestById,
-    deleteRequestByAdopter
+    readRequestByCPFAdopter,
+    deleteRequestByAdopter,
+    readRequestByAnimal
 } = require('../db_manager/db_client_requests_adopt');
 
 const {
@@ -112,28 +113,56 @@ router.get('/all-requests', async (req, res) => {
 
     try {
         const result = await readRequestsAdopt(ngoId);
-        res.status(result.statusCode).json(result.msg);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler requisições de adoção.' });
     }
 });
 
-router.get('/read-request', async (req, res) => {
+router.get('/read-request-by-animal', async (req, res) => {
     var ngoId;
-    var requestId;
+    var animalId;
+    var authToken;
 
-    if (req.body) {
+    if(req.body) {
         ngoId = req.body.ngoId;
-        requestId = req.body.requestId
+        animalId = req.body.animalId;
     }
 
-    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(requestId)) {
-        return res.status(400).json({ error: 'ID da ONG ou da requisição inválido.' });
+    if(req.header) {
+        authToken = req.header('Authorization');
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || !mongoose.Types.ObjectId.isValid(animalId)) {
+        return res.status(400).json({ error: 'ID da ONG ou do animal inválido.' });
     }
 
     try {
-        const result = await readRequestById(ngoId, requestId);
-        res.status(result.statusCode).json(result.msg);
+        const result = await readRequestByAnimal(ngoId, animalId, authToken);
+        res.status(result.statusCode).json({ message: result.msg });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Erro ao ler requisição.' });
+    }
+
+});
+
+router.get('/read-request', async (req, res) => {
+    var ngoId;
+    var cpfAdopter;
+
+    if (req.body) {
+        ngoId = req.body.ngoId;
+        cpfAdopter = req.body.cpfAdopter;
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ngoId) || cpfAdopter == null) {
+        return res.status(400).json({ error: 'ID da ONG ou CPF inválido.' });
+    }
+
+    try {
+        const result = await readRequestByCPFAdopter(ngoId, cpfAdopter);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler requisição.' });
     }

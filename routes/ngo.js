@@ -42,7 +42,7 @@ router.post('/create-ngo', async (req, res) => {
 router.get('/ngos', async (req, res) => {
   try {
     const result = await readNgo();
-    res.status(result.statusCode).json(result.msg);
+    res.status(result.statusCode).json({ message: result.msg });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar ONGs.' });
   }
@@ -63,7 +63,7 @@ router.get('/ngo', async (req, res) => {
   try {
     const result = await readNgoById(ngoId);
 
-    res.status(result.statusCode).json(result.msg);
+    res.status(result.statusCode).json({ message: result.msg });
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar ONG.' });
   }

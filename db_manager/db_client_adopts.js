@@ -129,7 +129,7 @@ async function undoAdopt(adoptId, ngoId, subjectNumber, authToken) {
 
         const adopt = ngo.adopts.filter(adopt => adopt._id.toString() === adoptId);
 
-        if(adopt == null) {
+        if(adopt.length == 0) {
             return { statusCode: 404, msg: "Adoção não encontrada."};
         }
 
@@ -188,6 +188,12 @@ async function rejectAll(ngoId, animalId, authToken) {
 
         if(ngo == null) {
             return { statusCode: 404, msg: "ONG não encontrada."};
+        }
+
+        const index = ngo.animals.findIndex((animal) => (animal._id.toString() === animalId));
+
+        if(index <= 0) {
+            return { statusCode: 404, msg: "Animal não encontrado."};
         }
 
         const updatedRequests = ngo.requestsAdopts.filter(request => request.animalId !== animalId);

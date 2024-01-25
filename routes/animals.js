@@ -65,7 +65,7 @@ router.get('/all-animals', async (req, res) => {
 
     try {
         const result = await readAnimals(ngoId);
-        res.status(result.statusCode).json(result.msg);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animais.' });
     }
@@ -86,7 +86,7 @@ router.get('/read-animal', async (req, res) => {
 
     try {
         const result = await readAnimalById(ngoId, animalId);
-        res.status(result.statusCode).json(result.msg);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animal.' });
     }
@@ -191,7 +191,7 @@ router.get('/read-animal-by-filter', async (req, res) => {
     try {
         var result = await readAnimalByFilters(ngoId, animalParameters, animalTypeFilters);
 
-        res.status(result.statusCode).json(result.msg);
+        res.status(result.statusCode).json({ message: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao ler animais por filtros.' });
     }

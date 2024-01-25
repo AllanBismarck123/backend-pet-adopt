@@ -27,7 +27,7 @@ router.post('/accept-adopt', async (req, res) => {
     try {
         const result = await acceptAdopt(ngoId, requestId, authToken);
         
-        res.status(result.statusCode).json({ msg: result.msg});
+        res.status(result.statusCode).json({ msg: result.msg });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao aceitar adoção.' });
     }
