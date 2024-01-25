@@ -26,7 +26,13 @@ Explore nossa [Documentação](https://documenter.getpostman.com/view/32475615/2
 
 Acompanhe nosso progresso e contribua para o desenvolvimento através do nosso [Quadro no Trello](https://trello.com/b/fRxmXbu5/plataforma-de-ado%C3%A7%C3%A3o-de-animais). Utilizamos a metodologia Kanban para organizar tarefas, implementações e melhorias. Seja parte do processo!
 
-# Como Contribuir 🤝
+## Modelagem do Banco de Dados 🗂️
+
+Explore o modelo do banco de dados da Plataforma de Adoção de Animais para entender como os dados são estruturados dentro do sistema. O modelo fornece insights sobre as relações entre diferentes entidades, facilitando uma visão abrangente da organização dos dados na plataforma.
+
+**[Modelagem do banco de dados](https://github.com/allan-bismarck/backend-pet-adopt/blob/main/modelagem_banco_de_dados/Diagrama%20plataforma%20de%20ado%C3%A7%C3%A3o%20de%20animais%20(1).jpg)**
+
+## Como Contribuir 🤝
 
 Obrigado por considerar contribuir para a Plataforma de Adoção de Animais! Sua ajuda é fundamental para tornar nossa plataforma ainda melhor. Siga os passos abaixo para começar:
 
